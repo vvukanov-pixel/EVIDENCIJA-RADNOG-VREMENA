@@ -19,8 +19,6 @@
       --btn-odlazak-hover: #8f3e36;
       --border-color: #e5e3dc;
       --muted: #6c7570;
-      --badge-bg: #e8f5e9;
-      --badge-text: #2e7d32;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -81,7 +79,7 @@
     }
     .user-greeting {
       font-family: 'Playfair Display', serif;
-      font-size: 40px;
+      font-size: 38px;
       font-weight: 700;
       line-height: 1.15;
       color: var(--text-dark);
@@ -196,7 +194,7 @@
     }
     .admin-title-group h2 {
       font-family: 'Playfair Display', serif;
-      font-size: 36px;
+      font-size: 34px;
       font-weight: 700;
       line-height: 1.1;
     }
@@ -349,7 +347,7 @@
   <div id="viewEmployee">
     <div class="user-hero">
       <div class="today-pill" id="todayPillText">DANAS · SRIJEDA, 19. KOLOVOZA 2026.</div>
-      <h2 class="user-greeting">Pozdrav, <span id="currentEmployeeDisplay">Vedran Vukanovic</span></h2>
+      <h2 class="user-greeting">Pozdrav, <span id="currentEmployeeDisplay">Vedran Vukanović</span></h2>
       <p class="user-subtext">Evidentirajte početak ili završetak radnog dana.</p>
     </div>
 
@@ -357,7 +355,7 @@
       <div class="user-switch-bar">
         <div>
           <div class="switch-label">Ovaj mobitel koristi</div>
-          <div class="current-user-name" id="currentEmployeeCardName">Vedran Vukanovic</div>
+          <div class="current-user-name" id="currentEmployeeCardName">Vedran Vukanović</div>
         </div>
         <button class="btn-promijeni" onclick="openWorkerSelector()">Promijeni</button>
       </div>
@@ -473,12 +471,11 @@
 </div>
 
 <script>
-  // GOOGLE APPS SCRIPT URL ZA TABLICU
   const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbzj4_gblGjt68M1obNJJOjnV8TN6yCu6WzuWL-BSC5aGUI_F4dLdhlph4JnPpdZ_8NyA/exec";
   const ADMIN_PIN = "2468";
 
   const WORKERS = [
-    "Vedran Vukanovic",
+    "Vedran Vukanović",
     "Ljubiša Došlo",
     "Slaven Puhalo",
     "Ranko Janjić",
@@ -493,6 +490,18 @@
 
   let currentWorker = localStorage.getItem('selected_worker') || WORKERS[0];
 
+  function getTodayKey() {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  function getRecords() {
+    return JSON.parse(localStorage.getItem('attendance_records') || '{}');
+  }
+
+  function saveRecords(data) {
+    localStorage.setItem('attendance_records', JSON.stringify(data));
+  }
+
   function init() {
     updateWorkerDisplay();
     populateWorkerModalSelect();
@@ -503,15 +512,19 @@
     document.getElementById('currentEmployeeDisplay').innerText = currentWorker;
     document.getElementById('currentEmployeeCardName').innerText = currentWorker;
     
-    const records = JSON.parse(localStorage.getItem('attendance_records') || '{}');
-    const today = new Date().toISOString().slice(0, 10);
+    const records = getRecords();
+    const today = getTodayKey();
     const userToday = records[today] && records[today][currentWorker];
 
     if (userToday) {
-      if (userToday.odlazak) {
+      if (userToday.izostanak) {
+        document.getElementById('userStatusDesc').innerText = userToday.izostanak;
+      } else if (userToday.odlazak) {
         document.getElementById('userStatusDesc').innerText = `Završeno (${userToday.dolazak} - ${userToday.odlazak})`;
       } else if (userToday.dolazak) {
         document.getElementById('userStatusDesc').innerText = `Na poslu od ${userToday.dolazak}`;
+      } else {
+        document.getElementById('userStatusDesc').innerText = 'Nije evidentirano';
       }
     } else {
       document.getElementById('userStatusDesc').innerText = 'Nije evidentirano';
@@ -544,7 +557,7 @@
   async function recordAction(action) {
     const now = new Date();
     const timeStr = now.toTimeString().slice(0, 5);
-    const today = now.toISOString().slice(0, 10);
+    const today = getTodayKey();
 
     // Slanje u Google tablicu knjigovođi
     try {
@@ -558,10 +571,12 @@
       console.error(e);
     }
 
-    // Lokalno spremanje za izgled sučelja
-    const records = JSON.parse(localStorage.getItem('attendance_records') || '{}');
+    // Lokalno ažuriranje
+    const records = getRecords();
     if (!records[today]) records[today] = {};
     if (!records[today][currentWorker]) records[today][currentWorker] = {};
+
+    delete records[today][currentWorker].izostanak;
 
     if (action === "Prijava") {
       records[today][currentWorker].dolazak = timeStr;
@@ -569,11 +584,30 @@
       records[today][currentWorker].odlazak = timeStr;
     }
 
-    localStorage.setItem('attendance_records', JSON.stringify(records));
+    saveRecords(records);
     updateWorkerDisplay();
     renderAdminView();
 
     alert(`✅ Zabilježeno: ${currentWorker} [${action === 'Prijava' ? 'DOLAZAK' : 'ODLAZAK'}] u ${timeStr}`);
+  }
+
+  function setIzostanak(worker, razlog) {
+    const today = getTodayKey();
+    const records = getRecords();
+    if (!records[today]) records[today] = {};
+    if (!records[today][worker]) records[today][worker] = {};
+
+    if (razlog === "") {
+      delete records[today][worker].izostanak;
+    } else {
+      records[today][worker].izostanak = razlog;
+      records[today][worker].dolazak = '';
+      records[today][worker].odlazak = '';
+    }
+
+    saveRecords(records);
+    updateWorkerDisplay();
+    renderAdminView();
   }
 
   function openAdminPinModal() {
@@ -616,9 +650,20 @@
     document.getElementById('viewEmployee').classList.remove('hidden');
   }
 
+  function calcDuration(start, end) {
+    if (!start || !end) return '—';
+    const [h1, m1] = start.split(':').map(Number);
+    const [h2, m2] = end.split(':').map(Number);
+    let diff = (h2 * 60 + m2) - (h1 * 60 + m1);
+    if (diff < 0) diff += 24 * 60;
+    const hours = Math.floor(diff / 60);
+    const mins = diff % 60;
+    return `${hours}h ${mins}m`;
+  }
+
   function renderAdminView() {
-    const today = new Date().toISOString().slice(0, 10);
-    const records = JSON.parse(localStorage.getItem('attendance_records') || '{}');
+    const today = getTodayKey();
+    const records = getRecords();
     const todayData = records[today] || {};
 
     let dosloCount = 0;
@@ -634,10 +679,15 @@
       const rec = todayData[worker] || {};
       const dolazak = rec.dolazak || '—';
       const odlazak = rec.odlazak || '—';
+      const ukupno = calcDuration(rec.dolazak, rec.odlazak);
+      
       let status = 'Nije evidentirano';
       let badgeStyle = 'background:#f1f5f9; color:#475569;';
 
-      if (rec.dolazak && !rec.odlazak) {
+      if (rec.izostanak) {
+        status = rec.izostanak;
+        badgeStyle = 'background:#fef3c7; color:#92400e;';
+      } else if (rec.dolazak && !rec.odlazak) {
         status = 'Na poslu';
         badgeStyle = 'background:#e8f5e9; color:#2e7d32;';
         dosloCount++;
@@ -655,19 +705,21 @@
           <td><strong>${worker}</strong></td>
           <td>${dolazak}</td>
           <td>${odlazak}</td>
-          <td>—</td>
+          <td>${ukupno}</td>
           <td><span class="badge-status" style="${badgeStyle}">${status}</span></td>
         </tr>
       `;
 
+      const currentIzostanak = rec.izostanak || '';
       izostanciDiv.innerHTML += `
         <div class="izostanak-row">
           <span style="font-weight:600; font-size:14px;">${worker}</span>
-          <select>
-            <option value="Godišnji odmor">Godišnji odmor</option>
-            <option value="Bolovanje">Bolovanje</option>
-            <option value="Plaćeni dopust">Plaćeni dopust</option>
-            <option value="Neopravdano">Neopravdano</option>
+          <select onchange="setIzostanak('${worker}', this.value)">
+            <option value="" ${currentIzostanak === '' ? 'selected' : ''}>— Odaberi izostanak —</option>
+            <option value="Godišnji odmor" ${currentIzostanak === 'Godišnji odmor' ? 'selected' : ''}>Godišnji odmor</option>
+            <option value="Bolovanje" ${currentIzostanak === 'Bolovanje' ? 'selected' : ''}>Bolovanje</option>
+            <option value="Plaćeni dopust" ${currentIzostanak === 'Plaćeni dopust' ? 'selected' : ''}>Plaćeni dopust</option>
+            <option value="Neopravdano" ${currentIzostanak === 'Neopravdano' ? 'selected' : ''}>Neopravdano</option>
           </select>
         </div>
       `;
@@ -679,26 +731,41 @@
     document.getElementById('kpiNije').innerText = nijeCount;
   }
 
+  // --- ISPRAVAN EXCEL IZVOZ S UTF-8 I TOČKA-ZAREZ ( ; ) ---
   function exportCSV() {
-    const today = new Date().toISOString().slice(0, 10);
-    const records = JSON.parse(localStorage.getItem('attendance_records') || '{}');
+    const today = getTodayKey();
+    const records = getRecords();
     const todayData = records[today] || {};
 
-    let csvContent = "data:text/csv;charset=utf-8,Zaposlenik,Dolazak,Odlazak,Status\n";
+    let csv = "\uFEFF"; // UTF-8 BOM za naša slova (š, đ, č, ć, ž)
+    csv += "Zaposlenik;Dolazak;Odlazak;Ukupno sati;Status\n";
+
     WORKERS.forEach(w => {
       const rec = todayData[w] || {};
       const dol = rec.dolazak || '';
       const odl = rec.odlazak || '';
-      const st = dol ? (odl ? 'Završio' : 'Na poslu') : 'Nije evidentirano';
-      csvContent += `"${w}","${dol}","${odl}","${st}"\n`;
+      const ukupno = calcDuration(rec.dolazak, rec.odlazak);
+      let status = 'Nije evidentirano';
+
+      if (rec.izostanak) {
+        status = rec.izostanak;
+      } else if (dol && !odl) {
+        status = 'Na poslu';
+      } else if (dol && odl) {
+        status = 'Završio smjenu';
+      }
+
+      csv += `"${w}";"${dol}";"${odl}";"${ukupno === '—' ? '' : ukupno}";"${status}"\n`;
     });
 
-    const encodedUri = encodeURI(csvContent);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `evidencija-${today}.csv`);
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Evidencija_${today}.csv`);
     document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
   }
 
   init();
