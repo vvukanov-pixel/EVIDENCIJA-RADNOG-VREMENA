@@ -3,105 +3,700 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Evidencija Radnika</title>
+  <title>Evidencija radnog vremena - PORTAL MONTAŽA&SERVIS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --bg-warm: #f6f4ee;
+      --card-bg: #ffffff;
+      --text-dark: #1b241e;
+      --brand-green: #1b4332;
+      --brand-green-hover: #143326;
+      --btn-dolazak: #a3c2b1;
+      --btn-dolazak-hover: #8eaf9d;
+      --btn-odlazak: #a84b42;
+      --btn-odlazak-hover: #8f3e36;
+      --border-color: #e5e3dc;
+      --muted: #6c7570;
+      --badge-bg: #e8f5e9;
+      --badge-text: #2e7d32;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #0f172a;
-      color: #f8fafc;
-      margin: 0;
-      padding: 20px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-warm);
+      color: var(--text-dark);
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    .container { max-width: 900px; margin: 0 auto; }
+
+    /* HEADER */
+    .app-header {
       display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      margin-bottom: 24px;
+    }
+    .brand-group { display: flex; align-items: center; gap: 12px; }
+    .brand-badge {
+      background: var(--brand-green);
+      color: #fff;
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 22px;
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
       justify-content: center;
     }
-    .card {
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 12px;
-      padding: 24px;
-      width: 100%;
-      max-width: 480px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-    }
-    h2 { margin-top: 0; color: #38bdf8; text-align: center; }
-    label { display: block; font-weight: 600; margin-top: 16px; margin-bottom: 6px; color: #cbd5e1; }
-    select, button {
-      width: 100%;
-      padding: 12px;
+    .brand-titles h1 { font-size: 17px; font-weight: 700; color: var(--text-dark); }
+    .brand-titles p { font-size: 13px; color: var(--muted); }
+    .btn-admin-nav {
+      background: #fff;
+      border: 1px solid var(--border-color);
+      padding: 8px 18px;
       border-radius: 8px;
-      border: 1px solid #334155;
-      font-size: 16px;
-      box-sizing: border-box;
-      background: #0f172a;
-      color: #fff;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      color: var(--text-dark);
     }
-    button {
-      background: #2563eb;
+
+    /* KORISNIČKI POGLED */
+    .user-hero { text-align: center; margin: 30px 0 25px; }
+    .today-pill {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--brand-green);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .user-greeting {
+      font-family: 'Playfair Display', serif;
+      font-size: 40px;
+      font-weight: 700;
+      line-height: 1.15;
+      color: var(--text-dark);
+      margin-bottom: 10px;
+    }
+    .user-subtext { font-size: 14px; color: var(--muted); }
+
+    .main-action-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+      border: 1px solid var(--border-color);
+      max-width: 540px;
+      margin: 0 auto 30px;
+    }
+    .user-switch-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .switch-label { font-size: 12px; color: var(--muted); }
+    .current-user-name { font-size: 16px; font-weight: 700; color: var(--text-dark); }
+    .btn-promijeni {
+      background: #f1f0ea;
+      border: 1px solid var(--border-color);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .status-box {
+      background: #f2f7f4;
+      border-left: 3px solid var(--brand-green);
+      padding: 14px 16px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+    .status-title { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+    .status-desc { font-size: 15px; font-weight: 700; color: var(--text-dark); }
+
+    .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .btn-action {
+      border: none;
+      padding: 16px 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #ffffff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .btn-dolazak { background-color: var(--btn-dolazak); }
+    .btn-dolazak:hover { background-color: var(--btn-dolazak-hover); }
+    .btn-odlazak { background-color: var(--btn-odlazak); }
+    .btn-odlazak:hover { background-color: var(--btn-odlazak-hover); }
+
+    .admin-fast-pin {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 20px;
+    }
+    .admin-fast-pin input {
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      width: 90px;
+      text-align: center;
+      font-size: 14px;
+      background: #fff;
+    }
+    .btn-fast-admin {
+      background: var(--text-dark);
       color: #fff;
       border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
       font-weight: 600;
-      margin-top: 24px;
+      font-size: 13px;
       cursor: pointer;
-      padding: 14px;
     }
-    button:disabled { background: #475569; cursor: not-allowed; }
+
+    .footer-logo { text-align: center; margin-top: 40px; opacity: 0.25; font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 800; }
+
+    /* ADMINISTRACIJSKI POGLED */
+    .admin-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .admin-title-group h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 36px;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+    .admin-title-group p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+    .admin-actions { display: flex; gap: 8px; align-items: center; }
+    .btn-pill-action {
+      background: #fff;
+      border: 1px solid var(--border-color);
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      color: var(--text-dark);
+    }
+    .btn-export {
+      background: var(--brand-green);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .izostanak-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 24px;
+    }
+    .izostanak-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .izostanak-card p { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+    .izostanak-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #f1f0eb;
+    }
+    .izostanak-row:last-child { border-bottom: none; }
+    .izostanak-row select {
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 13px;
+      background: #fff;
+    }
+
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .kpi-card {
+      background: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .kpi-label { font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
+    .kpi-value { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; }
+
+    .table-container {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      overflow-x: auto;
+      padding: 12px 16px;
+    }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th {
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 12px 8px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    td { padding: 14px 8px; font-size: 14px; border-bottom: 1px solid #f4f3ef; }
+    tr:last-child td { border-bottom: none; }
+    .badge-status {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--badge-bg);
+      color: var(--badge-text);
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100; padding: 16px;
+    }
+    .modal-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    .modal-card h3 { font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 8px; }
+    .modal-card p { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+    .modal-input {
+      width: 100%;
+      padding: 14px;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 20px;
+      text-align: center;
+      letter-spacing: 6px;
+      margin-bottom: 16px;
+    }
+    .btn-modal-submit {
+      width: 100%;
+      background: var(--brand-green);
+      color: #fff;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
-<div class="card">
-  <h2>⏱️ Evidencija Radnog Vremena</h2>
+<div class="container">
+  <!-- GLAVNI HEADER -->
+  <header class="app-header">
+    <div class="brand-group">
+      <div class="brand-badge">V</div>
+      <div class="brand-titles">
+        <h1>Evidencija radnog vremena</h1>
+        <p>Jednostavno. Točno. Pregledno.</p>
+      </div>
+    </div>
+    <button class="btn-admin-nav" onclick="openAdminPinModal()">Administracija</button>
+  </header>
 
-  <label>Odaberite radnika:</label>
-  <select id="workerSelect">
-    <option value="ZLATKO RADIŠ">ZLATKO RADIŠ</option>
-    <option value="SINIŠA PRAVICA">SINIŠA PRAVICA</option>
-    <option value="SLAVEN PUHALO">SLAVEN PUHALO</option>
-    <option value="NIKOLA MRDIĆ">NIKOLA MRDIĆ</option>
-    <option value="LJUBIŠA DOŠLO">LJUBIŠA DOŠLO</option>
-    <option value="RANKO JANJIĆ">RANKO JANJIĆ</option>
-    <option value="BRANISLAV BEGENUŠIĆ">BRANISLAV BEGENUŠIĆ</option>
-    <option value="MIODRAG ĆERANIĆ">MIODRAG ĆERANIĆ</option>
-    <option value="Radnik 9">Radnik 9</option>
-    <option value="Radnik 10">Radnik 10</option>
-  </select>
+  <!-- POGLED ZA RADNIKA -->
+  <div id="viewEmployee">
+    <div class="user-hero">
+      <div class="today-pill" id="todayPillText">DANAS · SRIJEDA, 19. KOLOVOZA 2026.</div>
+      <h2 class="user-greeting">Pozdrav, <span id="currentEmployeeDisplay">Vedran Vukanovic</span></h2>
+      <p class="user-subtext">Evidentirajte početak ili završetak radnog dana.</p>
+    </div>
 
-  <label>Radnja:</label>
-  <select id="actionType">
-    <option value="Prijava">🟢 Prijava (Dolazak na posao)</option>
-    <option value="Odjava">🔴 Odjava (Odlazak s posla)</option>
-  </select>
+    <div class="main-action-card">
+      <div class="user-switch-bar">
+        <div>
+          <div class="switch-label">Ovaj mobitel koristi</div>
+          <div class="current-user-name" id="currentEmployeeCardName">Vedran Vukanovic</div>
+        </div>
+        <button class="btn-promijeni" onclick="openWorkerSelector()">Promijeni</button>
+      </div>
 
-  <button id="submitBtn" onclick="recordAttendance()">Zabilježi u Google Tablicu</button>
+      <div class="status-box">
+        <div class="status-title">Današnji status</div>
+        <div class="status-desc" id="userStatusDesc">Nije evidentirano</div>
+      </div>
+
+      <div class="action-grid">
+        <button class="btn-action btn-dolazak" onclick="recordAction('Prijava')">
+          <span>&rarr;</span> DOLAZAK
+        </button>
+        <button class="btn-action btn-odlazak" onclick="recordAction('Odjava')">
+          <span>&larr;</span> ODLAZAK
+        </button>
+      </div>
+
+      <div class="admin-fast-pin">
+        <span style="font-size: 11px; color: var(--muted);">Pristup za odgovornu osobu</span>
+        <input type="password" id="fastPinInput" placeholder="PIN">
+        <button class="btn-fast-admin" onclick="checkFastPin()">Otvori izvještaje</button>
+      </div>
+    </div>
+
+    <div class="footer-logo">PORTAL MONTAŽA&SERVIS d.o.o. DUBROVNIK</div>
+  </div>
+
+  <!-- ADMINISTRACIJA / DNEVNI IZVJEŠTAJ -->
+  <div id="viewAdmin" class="hidden">
+    <div class="admin-top-bar">
+      <div class="admin-title-group">
+        <div style="font-size: 11px; font-weight: 700; color: var(--brand-green); letter-spacing: 1px; margin-bottom: 4px;">ADMINISTRACIJA</div>
+        <h2>Dnevni izvještaj</h2>
+        <p>Pregled evidencije pripremljen za knjigovodstvo.</p>
+      </div>
+      <div class="admin-actions">
+        <button class="btn-pill-action" onclick="closeAdmin()">Natrag na prijavu</button>
+        <button class="btn-pill-action" id="adminDateBtn">19.08.2026.</button>
+        <button class="btn-export" onclick="exportCSV()">Preuzmi Excel/CSV</button>
+      </div>
+    </div>
+
+    <!-- DODAJ IZOSTANAK -->
+    <div class="izostanak-card">
+      <h3 id="izostanakHeaderTitle">Dodaj izostanak za 2026-08-19</h3>
+      <p>Odaberite razlog uz zaposlenika koji nije na poslu.</p>
+      <div id="izostanciList"></div>
+    </div>
+
+    <!-- KPI STATISTIKA -->
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-label">Aktivnih zaposlenika</div>
+        <div class="kpi-value" id="kpiAktivni">11</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Došlo na posao</div>
+        <div class="kpi-value" id="kpiDoslo">0</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Završilo smjenu</div>
+        <div class="kpi-value" id="kpiZavrsilo">0</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Nije evidentirano</div>
+        <div class="kpi-value" id="kpiNije">11</div>
+      </div>
+    </div>
+
+    <!-- TABLICA RADNIKA -->
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Zaposlenik</th>
+            <th>Dolazak</th>
+            <th>Odlazak</th>
+            <th>Ukupno</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="adminTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ZA PIN -->
+<div id="pinModal" class="modal-overlay hidden">
+  <div class="modal-card">
+    <div style="font-size: 11px; font-weight: 700; color: var(--brand-green); letter-spacing: 1px; margin-bottom: 6px;">ZA ODGOVORNU OSOBU</div>
+    <h3>Unesite PIN</h3>
+    <p>PIN je potreban za izvještaje i uređivanje zaposlenika.</p>
+    <input type="password" id="modalPinInput" class="modal-input" placeholder="PIN" autofocus>
+    <button class="btn-modal-submit" onclick="submitPinModal()">Otvori administraciju</button>
+    <button style="margin-top: 10px; background: none; border: none; color: var(--muted); cursor: pointer;" onclick="closePinModal()">Odustani</button>
+  </div>
+</div>
+
+<!-- MODAL ZA ODABIR RADNIKA -->
+<div id="workerModal" class="modal-overlay hidden">
+  <div class="modal-card">
+    <h3>Odaberite svoj profil</h3>
+    <p>Odaberite ime koje će ovaj uređaj pamtiti.</p>
+    <select id="workerModalSelect" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 15px; margin-bottom: 20px;">
+      <!-- Popis će se automatski napuniti -->
+    </select>
+    <button class="btn-modal-submit" onclick="saveSelectedWorker()">Potvrdi</button>
+  </div>
 </div>
 
 <script>
+  // VAŠ GOOGLE APPS SCRIPT URL ZA AUTOMATSKO SLANJE KNJIGOVOĐI
   const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbzj4_gblGjt68M1obNJJOjnV8TN6yCu6WzuWL-BSC5aGUI_F4dLdhlph4JnPpdZ_8NyA/exec";
+  const ADMIN_PIN = "2468";
 
-  async function recordAttendance() {
-    const worker = document.getElementById('workerSelect').value;
-    const action = document.getElementById('actionType').value;
-    const btn = document.getElementById('submitBtn');
+  const WORKERS = [
+    "Vedran Vukanovic",
+    "Ljubiša Došlo",
+    "Slaven Puhalo",
+    "Ranko Janjić",
+    "Ankica Prkačin Bačić",
+    "Branislav Begenušić",
+    "Nikolina Burnać",
+    "Branislav Begenišić",
+    "Miodrag Ćeranić",
+    "Nikola Mrdić",
+    "Zlatko Radiš"
+  ];
 
-    btn.disabled = true;
-    btn.innerText = "Spremanje u tablicu...";
+  let currentWorker = localStorage.getItem('selected_worker') || WORKERS[0];
 
+  function init() {
+    updateWorkerDisplay();
+    populateWorkerModalSelect();
+    renderAdminView();
+  }
+
+  function updateWorkerDisplay() {
+    document.getElementById('currentEmployeeDisplay').innerText = currentWorker;
+    document.getElementById('currentEmployeeCardName').innerText = currentWorker;
+    
+    // Status iz lokalne memorije
+    const records = JSON.parse(localStorage.getItem('attendance_records') || '{}');
+    const today = new Date().toISOString().slice(0, 10);
+    const userToday = records[today] && records[today][currentWorker];
+
+    if (userToday) {
+      if (userToday.odlazak) {
+        document.getElementById('userStatusDesc').innerText = `Završeno (${userToday.dolazak} - ${userToday.odlazak})`;
+      } else if (userToday.dolazak) {
+        document.getElementById('userStatusDesc').innerText = `Na poslu od ${userToday.dolazak}`;
+      }
+    } else {
+      document.getElementById('userStatusDesc').innerText = 'Nije evidentirano';
+    }
+  }
+
+  function populateWorkerModalSelect() {
+    const sel = document.getElementById('workerModalSelect');
+    sel.innerHTML = '';
+    WORKERS.forEach(w => {
+      const opt = document.createElement('option');
+      opt.value = w;
+      opt.innerText = w;
+      if (w === currentWorker) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  }
+
+  function openWorkerSelector() {
+    document.getElementById('workerModal').classList.remove('hidden');
+  }
+
+  function saveSelectedWorker() {
+    currentWorker = document.getElementById('workerModalSelect').value;
+    localStorage.setItem('selected_worker', currentWorker);
+    document.getElementById('workerModal').classList.add('hidden');
+    updateWorkerDisplay();
+  }
+
+  // --- GLAVNO SLANJE: GOOGLE TABLICA + LOKALNO ---
+  async function recordAction(action) {
+    const now = new Date();
+    const timeStr = now.toTimeString().slice(0, 5);
+    const today = now.toISOString().slice(0, 10);
+
+    // 1. Šalji u Google tablicu knjigovođi
     try {
-      await fetch(GOOGLE_SHEET_URL, {
+      fetch(GOOGLE_SHEET_URL, {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ worker: worker, action: action })
+        body: JSON.stringify({ worker: currentWorker, action: action })
       });
+    } catch(e) {
+      console.error(e);
+    }
 
-      alert(`✅ Uspjeh: ${worker} (${action}) je upisan u Google tablicu knjigovođi!`);
-    } catch (e) {
-      alert("❌ Došlo je do greške: " + e);
-    } finally {
-      btn.disabled = false;
-      btn.innerText = "Zabilježi u Google Tablicu";
+    // 2. Spremi lokalno za prikaz sučelja
+    const records = JSON.parse(localStorage.getItem('attendance_records') || '{}');
+    if (!records[today]) records[today] = {};
+    if (!records[today][currentWorker]) records[today][currentWorker] = {};
+
+    if (action === "Prijava") {
+      records[today][currentWorker].dolazak = timeStr;
+    } else {
+      records[today][currentWorker].odlazak = timeStr;
+    }
+
+    localStorage.setItem('attendance_records', JSON.stringify(records));
+    updateWorkerDisplay();
+    renderAdminView();
+
+    alert(`✅ Zabilježeno: ${currentWorker} [${action === 'Prijava' ? 'DOLAZAK' : 'ODLAZAK'}] u ${timeStr}`);
+  }
+
+  // --- ADMINISTRACIJA ---
+  function openAdminPinModal() {
+    document.getElementById('pinModal').classList.remove('hidden');
+    document.getElementById('modalPinInput').value = '';
+    document.getElementById('modalPinInput').focus();
+  }
+
+  function closePinModal() {
+    document.getElementById('pinModal').classList.add('hidden');
+  }
+
+  function submitPinModal() {
+    const pin = document.getElementById('modalPinInput').value;
+    if (pin === ADMIN_PIN) {
+      closePinModal();
+      showAdminView();
+    } else {
+      alert('Pogrešan PIN!');
     }
   }
+
+  function checkFastPin() {
+    const pin = document.getElementById('fastPinInput').value;
+    if (pin === ADMIN_PIN) {
+      showAdminView();
+    } else {
+      alert('Pogrešan PIN!');
+    }
+  }
+
+  function showAdminView() {
+    document.getElementById('viewEmployee').classList.add('hidden');
+    document.getElementById('viewAdmin').classList.remove('hidden');
+    renderAdminView();
+  }
+
+  function closeAdmin() {
+    document.getElementById('viewAdmin').classList.add('hidden');
+    document.getElementById('viewEmployee').classList.remove('hidden');
+  }
+
+  function renderAdminView() {
+    const today = new Date().toISOString().slice(0, 10);
+    const records = JSON.parse(localStorage.getItem('attendance_records') || '{}');
+    const todayData = records[today] || {};
+
+    let dosloCount = 0;
+    let zavrsiloCount = 0;
+    let nijeCount = 0;
+
+    const tbody = document.getElementById('adminTableBody');
+    const izostanciDiv = document.getElementById('izostanciList');
+    tbody.innerHTML = '';
+    izostanciDiv.innerHTML = '';
+
+    WORKERS.forEach(worker => {
+      const rec = todayData[worker] || {};
+      const dolazak = rec.dolazak || '—';
+      const odlazak = rec.odlazak || '—';
+      let status = 'Nije na poslu';
+      let badgeClass = 'style="background:#f1f5f9; color:#475569;"';
+
+      if (rec.dolazak && !rec.odlazak) {
+        status = 'Na poslu';
+        badgeClass = 'style="background:#e8f5e9; color:#2e7d32;"';
+        dosloCount++;
+      } else if (rec.dolazak && rec.odlazak) {
+        status = 'Završio';
+        badgeClass = 'style="background:#e0f2fe; color:#0369a1;"';
+        dosloCount++;
+        zavrsiloCount++;
+      } else {
+        nijeCount++;
+      }
+
+      tbody.innerHTML += `
+        <tr>
+          <td><strong>${worker}</strong></td>
+          <td>${dolazak}</td>
+          <td>${odlazak}</td>
+          <td>—</td>
+          <td><span class="badge-status" ${badgeClass}>${status}</span></td>
+        </tr>
+      `;
+
+      izostanciDiv.innerHTML += `
+        <div class="izostanak-row">
+          <span style="font-weight:600; font-size:14px;">${worker}</span>
+          <select>
+            <option value="Godišnji odmor">Godišnji odmor</option>
+            <option value="Bolovanje">Bolovanje</option>
+            <option value="Plaćeni dopust">Plaćeni dopust</option>
+            <option value="Neopravdano">Neopravdano</option>
+          </select>
+        </div>
+      `;
+    });
+
+    document.getElementById('kpiAktivni').innerText = WORKERS.length;
+    document.getElementById('kpiDoslo').innerText = dosloCount;
+    document.getElementById('kpiZavrsilo').innerText = zavrsiloCount;
+    document.getElementById('kpiNije').innerText = nijeCount;
+  }
+
+  function exportCSV() {
+    const today = new Date().toISOString().slice(0, 10);
+    const records = JSON.parse(localStorage.getItem('attendance_records') || '{}');
+    const todayData = records[today] || {};
+
+    let csvContent = "data:text/csv;charset=utf-8,Zaposlenik,Dolazak,Odlazak,Status\n";
+    WORKERS.forEach(w => {
+      const rec = todayData[w] || {};
+      const dol = rec.dolazak || '';
+      const odl = rec.odlazak || '';
+      const st = dol ? (odl ? 'Završio' : 'Na poslu') : 'Nije evidentirano';
+      csvContent += `"${w}","${dol}","${odl}","${st}"\n`;
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `evidencija-${today}.csv`);
+    document.body.appendChild(link);
+    link.click();
+  }
+
+  init();
 </script>
 
 </body>
