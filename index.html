@@ -188,7 +188,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       flex-wrap: wrap;
       gap: 16px;
     }
@@ -200,26 +200,41 @@
     }
     .admin-title-group p { font-size: 13px; color: var(--muted); margin-top: 4px; }
     .admin-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-    
-    .date-picker-box {
-      display: flex;
-      align-items: center;
-      gap: 6px;
+
+    /* TRAKA ZA BIRANJE DATUMA */
+    .date-navigator-bar {
       background: #fff;
       border: 1px solid var(--border-color);
-      padding: 6px 12px;
-      border-radius: 8px;
+      border-radius: 12px;
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
     }
-    .date-picker-box input {
-      border: none;
-      font-family: inherit;
-      font-weight: 600;
-      font-size: 13px;
-      color: var(--text-dark);
-      outline: none;
-      background: transparent;
+    .date-nav-controls { display: flex; align-items: center; gap: 10px; }
+    .date-input-field {
+      padding: 8px 12px;
+      font-size: 15px;
+      font-weight: 700;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--brand-green);
+      background: #f8faf9;
       cursor: pointer;
     }
+    .btn-date-nav {
+      background: #fff;
+      border: 1px solid var(--border-color);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .btn-date-nav:hover { background: #f1f0eb; }
 
     .btn-pill-action {
       background: #fff;
@@ -429,21 +444,28 @@
     </div>
   </div>
 
-  <!-- ADMINISTRACIJA / DNEVNI IZVJEŠTAJ -->
+  <!-- ADMINISTRACIJA / PREGLED PO DATUMIMA -->
   <div id="viewAdmin" class="hidden">
     <div class="admin-top-bar">
       <div class="admin-title-group">
         <div style="font-size: 11px; font-weight: 700; color: var(--brand-green); letter-spacing: 1px; margin-bottom: 4px;">ADMINISTRATOR VEDRAN</div>
         <h2>Dnevni izvještaj</h2>
-        <p>Pregled evidencije po datumima s opcijama izmjene i brisanja.</p>
+        <p>Odaberite datum za pregled, izmjenu ili preuzimanje evidencije.</p>
       </div>
       <div class="admin-actions">
-        <div class="date-picker-box">
-          <label style="font-size: 12px; color: var(--muted); font-weight:600;">Datum:</label>
-          <input type="date" id="adminDatePicker" onchange="onAdminDateChange(this.value)">
-        </div>
         <button class="btn-pill-action" onclick="closeAdmin()">Natrag na prijavu</button>
-        <button class="btn-export" onclick="exportCSV()">Preuzmi Excel/CSV</button>
+        <button class="btn-export" onclick="exportCSV()">Preuzmi Excel za odabrani dan</button>
+      </div>
+    </div>
+
+    <!-- BIRANJE DATUMA -->
+    <div class="date-navigator-bar">
+      <div style="font-weight:700; font-size:14px;">📅 Odabrani datum evidencije:</div>
+      <div class="date-nav-controls">
+        <button class="btn-date-nav" onclick="changeDateByDays(-1)">◀ Prethodni dan</button>
+        <input type="date" id="adminDatePicker" class="date-input-field" onchange="onAdminDateChange(this.value)">
+        <button class="btn-date-nav" onclick="changeDateByDays(1)">Sljedeći dan ▶</button>
+        <button class="btn-date-nav" onclick="goToToday()">Danas</button>
       </div>
     </div>
 
@@ -556,9 +578,24 @@
     renderAdminView();
   }
 
+  // --- UPRAVLJANJE DATUMIMA U ADMINISTRACIJI ---
   function onAdminDateChange(val) {
     if (!val) return;
     selectedAdminDate = val;
+    renderAdminView();
+  }
+
+  function changeDateByDays(days) {
+    const d = new Date(selectedAdminDate);
+    d.setDate(d.getDate() + days);
+    selectedAdminDate = d.toISOString().slice(0, 10);
+    document.getElementById('adminDatePicker').value = selectedAdminDate;
+    renderAdminView();
+  }
+
+  function goToToday() {
+    selectedAdminDate = getTodayKey();
+    document.getElementById('adminDatePicker').value = selectedAdminDate;
     renderAdminView();
   }
 
@@ -608,12 +645,11 @@
     updateWorkerDisplay();
   }
 
-  // --- FIKSNO VRIJEME: DOLAZAK = 08:00, ODLAZAK = 16:00 ---
+  // --- RADNIK: DOLAZAK (08:00), ODLAZAK (16:00) ---
   async function recordAction(action) {
     const today = getTodayKey();
     const fixedTime = (action === "Prijava") ? "08:00" : "16:00";
 
-    // 1. Slanje u Google tablicu knjigovođi
     try {
       fetch(GOOGLE_SHEET_URL, {
         method: "POST",
@@ -625,7 +661,6 @@
       console.error(e);
     }
 
-    // 2. Lokalno ažuriranje
     const records = getRecords();
     if (!records[today]) records[today] = {};
     if (!records[today][currentWorker]) records[today][currentWorker] = {};
@@ -645,7 +680,7 @@
     alert(`✅ Zabilježeno: ${currentWorker} [${action === 'Prijava' ? 'DOLAZAK (08:00)' : 'ODLAZAK (16:00)'}]`);
   }
 
-  // --- ADMIN PISANJE & BRISANJE ---
+  // --- ADMIN RADNJE: PISANJE & BRISANJE ---
   function adminEditRecord(worker) {
     const records = getRecords();
     const cur = (records[selectedAdminDate] && records[selectedAdminDate][worker]) || {};
@@ -826,12 +861,12 @@
     document.getElementById('kpiNije').innerText = nijeCount;
   }
 
-  // --- ISPRAVAN EXCEL IZVOZ ZA ODABRANI DATUM ---
+  // --- ISPRAVAN EXCEL IZVOZ ZA TOČNO ODABRANI DATUM ---
   function exportCSV() {
     const records = getRecords();
     const dayData = records[selectedAdminDate] || {};
 
-    let csv = "\uFEFF"; // UTF-8 BOM za naša slova (š, đ, č, ć, ž)
+    let csv = "\uFEFF"; // UTF-8 BOM za čista hrvatska slova
     csv += "Datum;Zaposlenik;Dolazak;Odlazak;Ukupno sati;Status\n";
 
     WORKERS.forEach(w => {
