@@ -188,7 +188,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
       flex-wrap: wrap;
       gap: 16px;
     }
@@ -199,42 +199,45 @@
       line-height: 1.1;
     }
     .admin-title-group p { font-size: 13px; color: var(--muted); margin-top: 4px; }
-    .admin-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-
-    /* TRAKA ZA BIRANJE DATUMA */
-    .date-navigator-bar {
-      background: #fff;
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 12px 18px;
+    
+    .admin-actions {
       display: flex;
-      justify-content: space-between;
+      gap: 8px;
       align-items: center;
-      margin-bottom: 20px;
       flex-wrap: wrap;
-      gap: 12px;
     }
-    .date-nav-controls { display: flex; align-items: center; gap: 10px; }
-    .date-input-field {
-      padding: 8px 12px;
-      font-size: 15px;
-      font-weight: 700;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      color: var(--brand-green);
-      background: #f8faf9;
-      cursor: pointer;
-    }
-    .btn-date-nav {
+
+    /* BIRANJE DATUMA */
+    .date-picker-container {
+      display: flex;
+      align-items: center;
+      gap: 6px;
       background: #fff;
       border: 1px solid var(--border-color);
-      padding: 8px 12px;
+      padding: 4px 8px;
       border-radius: 8px;
-      font-weight: 600;
-      font-size: 13px;
-      cursor: pointer;
     }
-    .btn-date-nav:hover { background: #f1f0eb; }
+    .date-picker-input {
+      border: none;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--brand-green);
+      outline: none;
+      background: transparent;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .btn-date-arrow {
+      background: #f1f0eb;
+      border: none;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-weight: bold;
+      cursor: pointer;
+      color: var(--text-dark);
+    }
+    .btn-date-arrow:hover { background: #e2e0d8; }
 
     .btn-pill-action {
       background: #fff;
@@ -444,28 +447,23 @@
     </div>
   </div>
 
-  <!-- ADMINISTRACIJA / PREGLED PO DATUMIMA -->
+  <!-- ADMINISTRACIJA / DNEVNI IZVJEŠTAJ -->
   <div id="viewAdmin" class="hidden">
     <div class="admin-top-bar">
       <div class="admin-title-group">
         <div style="font-size: 11px; font-weight: 700; color: var(--brand-green); letter-spacing: 1px; margin-bottom: 4px;">ADMINISTRATOR VEDRAN</div>
         <h2>Dnevni izvještaj</h2>
-        <p>Odaberite datum za pregled, izmjenu ili preuzimanje evidencije.</p>
+        <p>Pregled evidencije po datumima s opcijama izmjene i brisanja.</p>
       </div>
       <div class="admin-actions">
+        <!-- PRAVI KALENDAR ZA BIRANJE DATUMA -->
+        <div class="date-picker-container">
+          <button class="btn-date-arrow" onclick="changeDateByDays(-1)" title="Prethodni dan">◀</button>
+          <input type="date" id="adminDatePicker" class="date-picker-input" onchange="onAdminDateChange(this.value)">
+          <button class="btn-date-arrow" onclick="changeDateByDays(1)" title="Sljedeći dan">▶</button>
+        </div>
         <button class="btn-pill-action" onclick="closeAdmin()">Natrag na prijavu</button>
-        <button class="btn-export" onclick="exportCSV()">Preuzmi Excel za odabrani dan</button>
-      </div>
-    </div>
-
-    <!-- BIRANJE DATUMA -->
-    <div class="date-navigator-bar">
-      <div style="font-weight:700; font-size:14px;">📅 Odabrani datum evidencije:</div>
-      <div class="date-nav-controls">
-        <button class="btn-date-nav" onclick="changeDateByDays(-1)">◀ Prethodni dan</button>
-        <input type="date" id="adminDatePicker" class="date-input-field" onchange="onAdminDateChange(this.value)">
-        <button class="btn-date-nav" onclick="changeDateByDays(1)">Sljedeći dan ▶</button>
-        <button class="btn-date-nav" onclick="goToToday()">Danas</button>
+        <button class="btn-export" onclick="exportCSV()">Preuzmi Excel/CSV</button>
       </div>
     </div>
 
@@ -578,7 +576,6 @@
     renderAdminView();
   }
 
-  // --- UPRAVLJANJE DATUMIMA U ADMINISTRACIJI ---
   function onAdminDateChange(val) {
     if (!val) return;
     selectedAdminDate = val;
@@ -589,12 +586,6 @@
     const d = new Date(selectedAdminDate);
     d.setDate(d.getDate() + days);
     selectedAdminDate = d.toISOString().slice(0, 10);
-    document.getElementById('adminDatePicker').value = selectedAdminDate;
-    renderAdminView();
-  }
-
-  function goToToday() {
-    selectedAdminDate = getTodayKey();
     document.getElementById('adminDatePicker').value = selectedAdminDate;
     renderAdminView();
   }
@@ -645,7 +636,6 @@
     updateWorkerDisplay();
   }
 
-  // --- RADNIK: DOLAZAK (08:00), ODLAZAK (16:00) ---
   async function recordAction(action) {
     const today = getTodayKey();
     const fixedTime = (action === "Prijava") ? "08:00" : "16:00";
@@ -680,7 +670,6 @@
     alert(`✅ Zabilježeno: ${currentWorker} [${action === 'Prijava' ? 'DOLAZAK (08:00)' : 'ODLAZAK (16:00)'}]`);
   }
 
-  // --- ADMIN RADNJE: PISANJE & BRISANJE ---
   function adminEditRecord(worker) {
     const records = getRecords();
     const cur = (records[selectedAdminDate] && records[selectedAdminDate][worker]) || {};
@@ -861,12 +850,11 @@
     document.getElementById('kpiNije').innerText = nijeCount;
   }
 
-  // --- ISPRAVAN EXCEL IZVOZ ZA TOČNO ODABRANI DATUM ---
   function exportCSV() {
     const records = getRecords();
     const dayData = records[selectedAdminDate] || {};
 
-    let csv = "\uFEFF"; // UTF-8 BOM za čista hrvatska slova
+    let csv = "\uFEFF";
     csv += "Datum;Zaposlenik;Dolazak;Odlazak;Ukupno sati;Status\n";
 
     WORKERS.forEach(w => {
