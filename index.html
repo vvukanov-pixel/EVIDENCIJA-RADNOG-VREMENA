@@ -346,7 +346,7 @@
   <!-- POGLED ZA RADNIKA -->
   <div id="viewEmployee">
     <div class="user-hero">
-      <div class="today-pill" id="todayPillText">DANAS · SRIJEDA, 19. KOLOVOZA 2026.</div>
+      <div class="today-pill" id="todayPillText">EVIDENCIJA SMJENE (08:00 - 16:00)</div>
       <h2 class="user-greeting">Pozdrav, <span id="currentEmployeeDisplay">Vedran Vukanović</span></h2>
       <p class="user-subtext">Evidentirajte početak ili završetak radnog dana.</p>
     </div>
@@ -367,10 +367,10 @@
 
       <div class="action-grid">
         <button class="btn-action btn-dolazak" onclick="recordAction('Prijava')">
-          <span>&rarr;</span> DOLAZAK
+          <span>&rarr;</span> DOLAZAK (08:00)
         </button>
         <button class="btn-action btn-odlazak" onclick="recordAction('Odjava')">
-          <span>&larr;</span> ODLAZAK
+          <span>&larr;</span> ODLAZAK (16:00)
         </button>
       </div>
 
@@ -397,14 +397,14 @@
       </div>
       <div class="admin-actions">
         <button class="btn-pill-action" onclick="closeAdmin()">Natrag na prijavu</button>
-        <button class="btn-pill-action" id="adminDateBtn">19.08.2026.</button>
+        <button class="btn-pill-action" id="adminDateBtn"></button>
         <button class="btn-export" onclick="exportCSV()">Preuzmi Excel/CSV</button>
       </div>
     </div>
 
     <!-- DODAJ IZOSTANAK -->
     <div class="izostanak-card">
-      <h3 id="izostanakHeaderTitle">Dodaj izostanak za 2026-08-19</h3>
+      <h3 id="izostanakHeaderTitle">Dodaj izostanak</h3>
       <p>Odaberite razlog uz zaposlenika koji nije na poslu.</p>
       <div id="izostanciList"></div>
     </div>
@@ -503,6 +503,13 @@
   }
 
   function init() {
+    const today = getTodayKey();
+    const dParts = today.split('-');
+    const formattedDate = `${dParts[2]}.${dParts[1]}.${dParts[0]}.`;
+    
+    document.getElementById('adminDateBtn').innerText = formattedDate;
+    document.getElementById('izostanakHeaderTitle').innerText = `Dodaj izostanak za ${today}`;
+    
     updateWorkerDisplay();
     populateWorkerModalSelect();
     renderAdminView();
@@ -554,24 +561,24 @@
     updateWorkerDisplay();
   }
 
+  // --- FIKSNO VRIJEME: DOLAZAK = 08:00, ODLAZAK = 16:00 ---
   async function recordAction(action) {
-    const now = new Date();
-    const timeStr = now.toTimeString().slice(0, 5);
     const today = getTodayKey();
+    const fixedTime = (action === "Prijava") ? "08:00" : "16:00";
 
-    // Slanje u Google tablicu knjigovođi
+    // 1. Slanje u Google tablicu knjigovođi
     try {
       fetch(GOOGLE_SHEET_URL, {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ worker: currentWorker, action: action })
+        body: JSON.stringify({ worker: currentWorker, action: action, time: fixedTime })
       });
     } catch(e) {
       console.error(e);
     }
 
-    // Lokalno ažuriranje
+    // 2. Lokalno ažuriranje
     const records = getRecords();
     if (!records[today]) records[today] = {};
     if (!records[today][currentWorker]) records[today][currentWorker] = {};
@@ -579,16 +586,16 @@
     delete records[today][currentWorker].izostanak;
 
     if (action === "Prijava") {
-      records[today][currentWorker].dolazak = timeStr;
+      records[today][currentWorker].dolazak = fixedTime;
     } else {
-      records[today][currentWorker].odlazak = timeStr;
+      records[today][currentWorker].odlazak = fixedTime;
     }
 
     saveRecords(records);
     updateWorkerDisplay();
     renderAdminView();
 
-    alert(`✅ Zabilježeno: ${currentWorker} [${action === 'Prijava' ? 'DOLAZAK' : 'ODLAZAK'}] u ${timeStr}`);
+    alert(`✅ Zabilježeno: ${currentWorker} [${action === 'Prijava' ? 'DOLAZAK (08:00)' : 'ODLAZAK (16:00)'}]`);
   }
 
   function setIzostanak(worker, razlog) {
@@ -658,7 +665,7 @@
     if (diff < 0) diff += 24 * 60;
     const hours = Math.floor(diff / 60);
     const mins = diff % 60;
-    return `${hours}h ${mins}m`;
+    return `${hours}h ${mins > 0 ? mins + 'm' : '00m'}`;
   }
 
   function renderAdminView() {
