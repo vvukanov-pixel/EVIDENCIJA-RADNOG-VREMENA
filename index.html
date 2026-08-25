@@ -183,7 +183,7 @@
     .footer-logo-main { font-size: 38px; line-height: 1; }
     .footer-logo-sub { font-size: 12px; letter-spacing: 3px; margin-top: 4px; }
 
-    /* ADMINISTRACIJA */
+    /* ADMINISTRACIJA / KNJIGOVODSTVO */
     .admin-top-bar {
       display: flex;
       justify-content: space-between;
@@ -207,7 +207,6 @@
       flex-wrap: wrap;
     }
 
-    /* BIRANJE DATUMA */
     .date-picker-container {
       display: flex;
       align-items: center;
@@ -435,7 +434,7 @@
       </div>
 
       <div class="admin-fast-pin">
-        <span style="font-size: 11px; color: var(--muted);">Pristup za administratora (Vedran)</span>
+        <span style="font-size: 11px; color: var(--muted);">Pristup (Vedran PIN: 2468 / Knjigovođa PIN: 1357)</span>
         <input type="password" id="fastPinInput" placeholder="PIN">
         <button class="btn-fast-admin" onclick="checkFastPin()">Otvori izvještaje</button>
       </div>
@@ -451,12 +450,11 @@
   <div id="viewAdmin" class="hidden">
     <div class="admin-top-bar">
       <div class="admin-title-group">
-        <div style="font-size: 11px; font-weight: 700; color: var(--brand-green); letter-spacing: 1px; margin-bottom: 4px;">ADMINISTRATOR VEDRAN</div>
+        <div id="userRoleBadge" style="font-size: 11px; font-weight: 700; color: var(--brand-green); letter-spacing: 1px; margin-bottom: 4px;">ADMINISTRATOR VEDRAN</div>
         <h2>Dnevni izvještaj</h2>
-        <p>Pregled evidencije po datumima s opcijama izmjene i brisanja.</p>
+        <p id="userRoleDesc">Pregled evidencije po datumima s opcijama izmjene i brisanja.</p>
       </div>
       <div class="admin-actions">
-        <!-- PRAVI KALENDAR ZA BIRANJE DATUMA -->
         <div class="date-picker-container">
           <button class="btn-date-arrow" onclick="changeDateByDays(-1)" title="Prethodni dan">◀</button>
           <input type="date" id="adminDatePicker" class="date-picker-input" onchange="onAdminDateChange(this.value)">
@@ -467,8 +465,8 @@
       </div>
     </div>
 
-    <!-- DODAJ IZOSTANAK -->
-    <div class="izostanak-card">
+    <!-- DODAJ IZOSTANAK (SAMO ZA VEDRANA) -->
+    <div id="izostanakCardWrapper" class="izostanak-card">
       <h3 id="izostanakHeaderTitle">Dodaj izostanak</h3>
       <p>Odaberite razlog uz zaposlenika koji nije bio na poslu za odabrani datum.</p>
       <div id="izostanciList"></div>
@@ -504,7 +502,7 @@
             <th>Odlazak</th>
             <th>Ukupno</th>
             <th>Status</th>
-            <th style="text-align: right;">Admin Radnje</th>
+            <th id="thAdminActions" style="text-align: right;">Admin Radnje</th>
           </tr>
         </thead>
         <tbody id="adminTableBody"></tbody>
@@ -516,11 +514,11 @@
 <!-- MODAL ZA PIN -->
 <div id="pinModal" class="modal-overlay hidden">
   <div class="modal-card">
-    <div style="font-size: 11px; font-weight: 700; color: var(--brand-green); letter-spacing: 1px; margin-bottom: 6px;">ADMINISTRATOR VEDRAN</div>
+    <div style="font-size: 11px; font-weight: 700; color: var(--brand-green); letter-spacing: 1px; margin-bottom: 6px;">PRIJAVA U SUSTAV</div>
     <h3>Unesite PIN</h3>
-    <p>PIN je potreban za pregled i izmjenu izvještaja po datumima.</p>
+    <p>Unesite PIN za Administratora (2468) ili Knjigovodstvo (1357).</p>
     <input type="password" id="modalPinInput" class="modal-input" placeholder="PIN" autofocus>
-    <button class="btn-modal-submit" onclick="submitPinModal()">Otvori administraciju</button>
+    <button class="btn-modal-submit" onclick="submitPinModal()">Otvori sustav</button>
     <button style="margin-top: 10px; background: none; border: none; color: var(--muted); cursor: pointer;" onclick="closePinModal()">Odustani</button>
   </div>
 </div>
@@ -538,7 +536,12 @@
 
 <script>
   const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbzj4_gblGjt68M1obNJJOjnV8TN6yCu6WzuWL-BSC5aGUI_F4dLdhlph4JnPpdZ_8NyA/exec";
-  const ADMIN_PIN = "2468";
+  
+  // DVIJE RAZINE PRISTUPA
+  const PIN_ADMIN = "2468";       // Vedran: uređivanje, brisanje, dodavanje izostanaka, excel
+  const PIN_KNJIGOVODJA = "1357"; // Knjigovođa: samo pregled i preuzimanje Excela
+
+  let currentUserRole = "NONE"; // 'ADMIN' ili 'KNJIGOVODJA'
 
   const WORKERS = [
     "Vedran Vukanović",
@@ -636,6 +639,7 @@
     updateWorkerDisplay();
   }
 
+  // --- RADNIK BILJEŽI: DOLAZAK (08:00), ODLAZAK (16:00) ---
   async function recordAction(action) {
     const today = getTodayKey();
     const fixedTime = (action === "Prijava") ? "08:00" : "16:00";
@@ -670,7 +674,67 @@
     alert(`✅ Zabilježeno: ${currentWorker} [${action === 'Prijava' ? 'DOLAZAK (08:00)' : 'ODLAZAK (16:00)'}]`);
   }
 
+  // --- AUTENTIFIKACIJA PREMA PIN-U ---
+  function openAdminPinModal() {
+    document.getElementById('pinModal').classList.remove('hidden');
+    document.getElementById('modalPinInput').value = '';
+    document.getElementById('modalPinInput').focus();
+  }
+
+  function closePinModal() {
+    document.getElementById('pinModal').classList.add('hidden');
+  }
+
+  function submitPinModal() {
+    const pin = document.getElementById('modalPinInput').value.trim();
+    handlePinAuth(pin);
+  }
+
+  function checkFastPin() {
+    const pin = document.getElementById('fastPinInput').value.trim();
+    handlePinAuth(pin);
+  }
+
+  function handlePinAuth(pin) {
+    if (pin === PIN_ADMIN) {
+      currentUserRole = "ADMIN";
+      closePinModal();
+      showAdminView();
+    } else if (pin === PIN_KNJIGOVODJA) {
+      currentUserRole = "KNJIGOVODJA";
+      closePinModal();
+      showAdminView();
+    } else {
+      alert("❌ Pogrešan PIN!");
+    }
+  }
+
+  function showAdminView() {
+    document.getElementById('viewEmployee').classList.add('hidden');
+    document.getElementById('viewAdmin').classList.remove('hidden');
+
+    const isAdmin = (currentUserRole === "ADMIN");
+    
+    // Podešavanje sučelja ovisno o ulozi
+    document.getElementById('userRoleBadge').innerText = isAdmin ? "ADMINISTRATOR VEDRAN (PUNI PRISTUP)" : "KNJIGOVODSTVO (SAMO PREGLED & EXCEL)";
+    document.getElementById('userRoleDesc').innerText = isAdmin ? "Pregled evidencije po datumima s opcijama izmjene i brisanja." : "Pregled i preuzimanje službenih Excel/CSV izvještaja.";
+    
+    // Knjigovođa ne vidi opciju unosa izostanaka niti stupac za akcije
+    document.getElementById('izostanakCardWrapper').classList.toggle('hidden', !isAdmin);
+    document.getElementById('thAdminActions').classList.toggle('hidden', !isAdmin);
+
+    renderAdminView();
+  }
+
+  function closeAdmin() {
+    currentUserRole = "NONE";
+    document.getElementById('viewAdmin').classList.add('hidden');
+    document.getElementById('viewEmployee').classList.remove('hidden');
+  }
+
+  // --- ADMIN PISANJE & BRISANJE (SAMO VEDRAN) ---
   function adminEditRecord(worker) {
+    if (currentUserRole !== "ADMIN") return;
     const records = getRecords();
     const cur = (records[selectedAdminDate] && records[selectedAdminDate][worker]) || {};
 
@@ -693,6 +757,7 @@
   }
 
   function adminDeleteRecord(worker) {
+    if (currentUserRole !== "ADMIN") return;
     if (!confirm(`Želite li potpuno obrisati unos za zaposlenika ${worker} na dan ${selectedAdminDate}?`)) return;
 
     const records = getRecords();
@@ -706,6 +771,7 @@
   }
 
   function setIzostanak(worker, razlog) {
+    if (currentUserRole !== "ADMIN") return;
     const records = getRecords();
     if (!records[selectedAdminDate]) records[selectedAdminDate] = {};
     if (!records[selectedAdminDate][worker]) records[selectedAdminDate][worker] = {};
@@ -721,46 +787,6 @@
     saveRecords(records);
     updateWorkerDisplay();
     renderAdminView();
-  }
-
-  function openAdminPinModal() {
-    document.getElementById('pinModal').classList.remove('hidden');
-    document.getElementById('modalPinInput').value = '';
-    document.getElementById('modalPinInput').focus();
-  }
-
-  function closePinModal() {
-    document.getElementById('pinModal').classList.add('hidden');
-  }
-
-  function submitPinModal() {
-    const pin = document.getElementById('modalPinInput').value;
-    if (pin === ADMIN_PIN) {
-      closePinModal();
-      showAdminView();
-    } else {
-      alert('Pogrešan PIN!');
-    }
-  }
-
-  function checkFastPin() {
-    const pin = document.getElementById('fastPinInput').value;
-    if (pin === ADMIN_PIN) {
-      showAdminView();
-    } else {
-      alert('Pogrešan PIN!');
-    }
-  }
-
-  function showAdminView() {
-    document.getElementById('viewEmployee').classList.add('hidden');
-    document.getElementById('viewAdmin').classList.remove('hidden');
-    renderAdminView();
-  }
-
-  function closeAdmin() {
-    document.getElementById('viewAdmin').classList.add('hidden');
-    document.getElementById('viewEmployee').classList.remove('hidden');
   }
 
   function calcDuration(start, end) {
@@ -780,6 +806,7 @@
     
     const records = getRecords();
     const dayData = records[selectedAdminDate] || {};
+    const isAdmin = (currentUserRole === "ADMIN");
 
     let dosloCount = 0;
     let zavrsiloCount = 0;
@@ -815,6 +842,16 @@
         nijeCount++;
       }
 
+      let actionsCell = '';
+      if (isAdmin) {
+        actionsCell = `
+          <td style="text-align: right; white-space: nowrap;">
+            <button class="btn-table-edit" onclick="adminEditRecord('${worker}')">✏️ Uredi</button>
+            <button class="btn-table-del" onclick="adminDeleteRecord('${worker}')">🗑️ Obriši</button>
+          </td>
+        `;
+      }
+
       tbody.innerHTML += `
         <tr>
           <td><strong>${worker}</strong></td>
@@ -822,26 +859,25 @@
           <td>${odlazak}</td>
           <td>${ukupno}</td>
           <td><span class="badge-status" style="${badgeStyle}">${status}</span></td>
-          <td style="text-align: right; white-space: nowrap;">
-            <button class="btn-table-edit" onclick="adminEditRecord('${worker}')">✏️ Uredi</button>
-            <button class="btn-table-del" onclick="adminDeleteRecord('${worker}')">🗑️ Obriši</button>
-          </td>
+          ${actionsCell}
         </tr>
       `;
 
-      const currentIzostanak = rec.izostanak || '';
-      izostanciDiv.innerHTML += `
-        <div class="izostanak-row">
-          <span style="font-weight:600; font-size:14px;">${worker}</span>
-          <select onchange="setIzostanak('${worker}', this.value)">
-            <option value="" ${currentIzostanak === '' ? 'selected' : ''}>— Odaberi izostanak —</option>
-            <option value="Godišnji odmor" ${currentIzostanak === 'Godišnji odmor' ? 'selected' : ''}>Godišnji odmor</option>
-            <option value="Bolovanje" ${currentIzostanak === 'Bolovanje' ? 'selected' : ''}>Bolovanje</option>
-            <option value="Plaćeni dopust" ${currentIzostanak === 'Plaćeni dopust' ? 'selected' : ''}>Plaćeni dopust</option>
-            <option value="Neopravdano" ${currentIzostanak === 'Neopravdano' ? 'selected' : ''}>Neopravdano</option>
-          </select>
-        </div>
-      `;
+      if (isAdmin) {
+        const currentIzostanak = rec.izostanak || '';
+        izostanciDiv.innerHTML += `
+          <div class="izostanak-row">
+            <span style="font-weight:600; font-size:14px;">${worker}</span>
+            <select onchange="setIzostanak('${worker}', this.value)">
+              <option value="" ${currentIzostanak === '' ? 'selected' : ''}>— Odaberi izostanak —</option>
+              <option value="Godišnji odmor" ${currentIzostanak === 'Godišnji odmor' ? 'selected' : ''}>Godišnji odmor</option>
+              <option value="Bolovanje" ${currentIzostanak === 'Bolovanje' ? 'selected' : ''}>Bolovanje</option>
+              <option value="Plaćeni dopust" ${currentIzostanak === 'Plaćeni dopust' ? 'selected' : ''}>Plaćeni dopust</option>
+              <option value="Neopravdano" ${currentIzostanak === 'Neopravdano' ? 'selected' : ''}>Neopravdano</option>
+            </select>
+          </div>
+        `;
+      }
     });
 
     document.getElementById('kpiAktivni').innerText = WORKERS.length;
