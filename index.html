@@ -183,7 +183,7 @@
     .footer-logo-main { font-size: 38px; line-height: 1; }
     .footer-logo-sub { font-size: 12px; letter-spacing: 3px; margin-top: 4px; }
 
-    /* ADMINISTRACIJA / KNJIGOVODSTVO */
+    /* ADMINISTRACIJA */
     .admin-top-bar {
       display: flex;
       justify-content: space-between;
@@ -259,15 +259,16 @@
       cursor: pointer;
     }
 
-    .izostanak-card {
+    .card-box {
       background: #fff;
       border-radius: 12px;
       padding: 20px;
       border: 1px solid var(--border-color);
       margin-bottom: 24px;
     }
-    .izostanak-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-    .izostanak-card p { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+    .card-box h3 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .card-box p { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+    
     .izostanak-row {
       display: flex;
       justify-content: space-between;
@@ -282,6 +283,17 @@
       border-radius: 6px;
       font-size: 13px;
       background: #fff;
+    }
+
+    .manage-worker-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      background: #f8faf9;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      margin-bottom: 8px;
     }
 
     .kpi-row {
@@ -465,8 +477,19 @@
       </div>
     </div>
 
+    <!-- UPRAVLJANJE ZAPOSLENICIMA (SAMO VEDRAN) -->
+    <div id="manageWorkersWrapper" class="card-box">
+      <h3>👥 Upravljanje zaposlenicima</h3>
+      <p>Dodajte nove radnike u sustav ili uklonite postojeće.</p>
+      <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+        <input type="text" id="newWorkerName" placeholder="Ime i prezime novog radnika..." style="flex:1; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px;">
+        <button class="btn-export" onclick="addNewWorker()">+ Dodaj zaposlenika</button>
+      </div>
+      <div id="manageWorkersList"></div>
+    </div>
+
     <!-- DODAJ IZOSTANAK (SAMO ZA VEDRANA) -->
-    <div id="izostanakCardWrapper" class="izostanak-card">
+    <div id="izostanakCardWrapper" class="card-box">
       <h3 id="izostanakHeaderTitle">Dodaj izostanak</h3>
       <p>Odaberite razlog uz zaposlenika koji nije bio na poslu za odabrani datum.</p>
       <div id="izostanciList"></div>
@@ -537,13 +560,10 @@
 <script>
   const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbzj4_gblGjt68M1obNJJOjnV8TN6yCu6WzuWL-BSC5aGUI_F4dLdhlph4JnPpdZ_8NyA/exec";
   
-  // DVIJE RAZINE PRISTUPA
-  const PIN_ADMIN = "2468";       // Vedran: uređivanje, brisanje, dodavanje izostanaka, excel
-  const PIN_KNJIGOVODJA = "1357"; // Knjigovođa: samo pregled i preuzimanje Excela
+  const PIN_ADMIN = "2468";       // Vedran
+  const PIN_KNJIGOVODJA = "1357"; // Knjigovođa
 
-  let currentUserRole = "NONE"; // 'ADMIN' ili 'KNJIGOVODJA'
-
-  const WORKERS = [
+  const DEFAULT_WORKERS = [
     "Vedran Vukanović",
     "Ljubiša Došlo",
     "Slaven Puhalo",
@@ -557,7 +577,17 @@
     "Zlatko Radiš"
   ];
 
-  let currentWorker = localStorage.getItem('selected_worker') || WORKERS[0];
+  function getWorkers() {
+    const w = localStorage.getItem('company_workers');
+    return w ? JSON.parse(w) : DEFAULT_WORKERS;
+  }
+
+  function saveWorkers(wList) {
+    localStorage.setItem('company_workers', JSON.stringify(wList));
+  }
+
+  let currentUserRole = "NONE";
+  let currentWorker = localStorage.getItem('selected_worker') || getWorkers()[0];
   let selectedAdminDate = getTodayKey();
 
   function getTodayKey() {
@@ -594,6 +624,12 @@
   }
 
   function updateWorkerDisplay() {
+    const workers = getWorkers();
+    if (!workers.includes(currentWorker)) {
+      currentWorker = workers[0] || "Nema radnika";
+      localStorage.setItem('selected_worker', currentWorker);
+    }
+
     document.getElementById('currentEmployeeDisplay').innerText = currentWorker;
     document.getElementById('currentEmployeeCardName').innerText = currentWorker;
     
@@ -619,7 +655,7 @@
   function populateWorkerModalSelect() {
     const sel = document.getElementById('workerModalSelect');
     sel.innerHTML = '';
-    WORKERS.forEach(w => {
+    getWorkers().forEach(w => {
       const opt = document.createElement('option');
       opt.value = w;
       opt.innerText = w;
@@ -629,6 +665,7 @@
   }
 
   function openWorkerSelector() {
+    populateWorkerModalSelect();
     document.getElementById('workerModal').classList.remove('hidden');
   }
 
@@ -639,7 +676,6 @@
     updateWorkerDisplay();
   }
 
-  // --- RADNIK BILJEŽI: DOLAZAK (08:00), ODLAZAK (16:00) ---
   async function recordAction(action) {
     const today = getTodayKey();
     const fixedTime = (action === "Prijava") ? "08:00" : "16:00";
@@ -672,6 +708,44 @@
     renderAdminView();
 
     alert(`✅ Zabilježeno: ${currentWorker} [${action === 'Prijava' ? 'DOLAZAK (08:00)' : 'ODLAZAK (16:00)'}]`);
+  }
+
+  // --- UPRAVLJANJE RADNICIMA (DODAVANJE I BRISANJE) ---
+  function addNewWorker() {
+    if (currentUserRole !== "ADMIN") return;
+    const input = document.getElementById('newWorkerName');
+    const name = input.value.trim();
+    if (!name) return alert('Upišite ime i prezime zaposlenika!');
+
+    const workers = getWorkers();
+    if (workers.includes(name)) return alert('Taj zaposlenik već postoji na popisu!');
+
+    workers.push(name);
+    saveWorkers(workers);
+    input.value = '';
+    
+    populateWorkerModalSelect();
+    renderAdminView();
+    alert(`✅ Zaposlenik ${name} je uspješno dodan!`);
+  }
+
+  function removeWorker(name) {
+    if (currentUserRole !== "ADMIN") return;
+    if (!confirm(`Jeste li sigurni da želite ukloniti radnika ${name} s popisa?`)) return;
+
+    let workers = getWorkers();
+    workers = workers.filter(w => w !== name);
+    saveWorkers(workers);
+
+    if (currentWorker === name) {
+      currentWorker = workers[0] || "";
+      localStorage.setItem('selected_worker', currentWorker);
+    }
+
+    updateWorkerDisplay();
+    populateWorkerModalSelect();
+    renderAdminView();
+    alert(`🗑️ Radnik ${name} je uklonjen.`);
   }
 
   // --- AUTENTIFIKACIJA PREMA PIN-U ---
@@ -715,11 +789,10 @@
 
     const isAdmin = (currentUserRole === "ADMIN");
     
-    // Podešavanje sučelja ovisno o ulozi
     document.getElementById('userRoleBadge').innerText = isAdmin ? "ADMINISTRATOR VEDRAN (PUNI PRISTUP)" : "KNJIGOVODSTVO (SAMO PREGLED & EXCEL)";
-    document.getElementById('userRoleDesc').innerText = isAdmin ? "Pregled evidencije po datumima s opcijama izmjene i brisanja." : "Pregled i preuzimanje službenih Excel/CSV izvještaja.";
+    document.getElementById('userRoleDesc').innerText = isAdmin ? "Pregled evidencije po datumima s opcijama izmjene, brisanja i dodavanja radnika." : "Pregled i preuzimanje službenih Excel/CSV izvještaja.";
     
-    // Knjigovođa ne vidi opciju unosa izostanaka niti stupac za akcije
+    document.getElementById('manageWorkersWrapper').classList.toggle('hidden', !isAdmin);
     document.getElementById('izostanakCardWrapper').classList.toggle('hidden', !isAdmin);
     document.getElementById('thAdminActions').classList.toggle('hidden', !isAdmin);
 
@@ -732,7 +805,7 @@
     document.getElementById('viewEmployee').classList.remove('hidden');
   }
 
-  // --- ADMIN PISANJE & BRISANJE (SAMO VEDRAN) ---
+  // --- ADMIN PISANJE & BRISANJE SATI ---
   function adminEditRecord(worker) {
     if (currentUserRole !== "ADMIN") return;
     const records = getRecords();
@@ -758,7 +831,7 @@
 
   function adminDeleteRecord(worker) {
     if (currentUserRole !== "ADMIN") return;
-    if (!confirm(`Želite li potpuno obrisati unos za zaposlenika ${worker} na dan ${selectedAdminDate}?`)) return;
+    if (!confirm(`Želite li potpuno obrisati dnevni unos za zaposlenika ${worker} na dan ${selectedAdminDate}?`)) return;
 
     const records = getRecords();
     if (records[selectedAdminDate] && records[selectedAdminDate][worker]) {
@@ -804,6 +877,7 @@
   function renderAdminView() {
     document.getElementById('izostanakHeaderTitle').innerText = `Dodaj izostanak za ${selectedAdminDate}`;
     
+    const workers = getWorkers();
     const records = getRecords();
     const dayData = records[selectedAdminDate] || {};
     const isAdmin = (currentUserRole === "ADMIN");
@@ -814,10 +888,13 @@
 
     const tbody = document.getElementById('adminTableBody');
     const izostanciDiv = document.getElementById('izostanciList');
+    const manageListDiv = document.getElementById('manageWorkersList');
+    
     tbody.innerHTML = '';
     izostanciDiv.innerHTML = '';
+    if (manageListDiv) manageListDiv.innerHTML = '';
 
-    WORKERS.forEach(worker => {
+    workers.forEach(worker => {
       const rec = dayData[worker] || {};
       const dolazak = rec.dolazak || '—';
       const odlazak = rec.odlazak || '—';
@@ -877,10 +954,17 @@
             </select>
           </div>
         `;
+
+        manageListDiv.innerHTML += `
+          <div class="manage-worker-item">
+            <span style="font-weight:600; font-size:14px;">${worker}</span>
+            <button class="btn-table-del" onclick="removeWorker('${worker}')">✖ Ukloni radnika</button>
+          </div>
+        `;
       }
     });
 
-    document.getElementById('kpiAktivni').innerText = WORKERS.length;
+    document.getElementById('kpiAktivni').innerText = workers.length;
     document.getElementById('kpiDoslo').innerText = dosloCount;
     document.getElementById('kpiZavrsilo').innerText = zavrsiloCount;
     document.getElementById('kpiNije').innerText = nijeCount;
@@ -893,7 +977,7 @@
     let csv = "\uFEFF";
     csv += "Datum;Zaposlenik;Dolazak;Odlazak;Ukupno sati;Status\n";
 
-    WORKERS.forEach(w => {
+    getWorkers().forEach(w => {
       const rec = dayData[w] || {};
       const dol = rec.dolazak || '';
       const odl = rec.odlazak || '';
