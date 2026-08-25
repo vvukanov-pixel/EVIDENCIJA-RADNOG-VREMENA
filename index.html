@@ -417,7 +417,7 @@
   <!-- POGLED ZA RADNIKA -->
   <div id="viewEmployee">
     <div class="user-hero">
-      <div class="today-pill" id="todayPillText">EVIDENCIJA SMJENE (08:00 - 16:00)</div>
+      <div class="today-pill" id="todayPillText">EVIDENCIJA SMJENE</div>
       <h2 class="user-greeting">Pozdrav, <span id="currentEmployeeDisplay">Vedran Vukanović</span></h2>
       <p class="user-subtext">Evidentirajte početak ili završetak radnog dana.</p>
     </div>
@@ -437,10 +437,10 @@
       </div>
 
       <div class="action-grid">
-        <button class="btn-action btn-dolazak" onclick="recordAction('Prijava')">
+        <button class="btn-action btn-dolazak" id="btnActionDolazak" onclick="recordAction('Prijava')">
           <span>&rarr;</span> DOLAZAK (08:00)
         </button>
-        <button class="btn-action btn-odlazak" onclick="recordAction('Odjava')">
+        <button class="btn-action btn-odlazak" id="btnActionOdlazak" onclick="recordAction('Odjava')">
           <span>&larr;</span> ODLAZAK (16:00)
         </button>
       </div>
@@ -602,6 +602,16 @@
     localStorage.setItem('attendance_records', JSON.stringify(data));
   }
 
+  // --- PRAVILO RADNOG VREMENA (ANKICA: 09:00 - 13:00, OSTALI: 08:00 - 16:00) ---
+  function getShiftForWorker(name) {
+    const isAnkica = name.toLowerCase().includes("ankica");
+    return {
+      dolazak: isAnkica ? "09:00" : "08:00",
+      odlazak: isAnkica ? "13:00" : "16:00",
+      label: isAnkica ? "09:00 - 13:00" : "08:00 - 16:00"
+    };
+  }
+
   function init() {
     document.getElementById('adminDatePicker').value = selectedAdminDate;
     updateWorkerDisplay();
@@ -633,6 +643,12 @@
     document.getElementById('currentEmployeeDisplay').innerText = currentWorker;
     document.getElementById('currentEmployeeCardName').innerText = currentWorker;
     
+    // Prilagodba teksta na tipkama prema radnom vremenu radnika
+    const shift = getShiftForWorker(currentWorker);
+    document.getElementById('todayPillText').innerText = `EVIDENCIJA SMJENE (${shift.label})`;
+    document.getElementById('btnActionDolazak').innerHTML = `<span>&rarr;</span> DOLAZAK (${shift.dolazak})`;
+    document.getElementById('btnActionOdlazak').innerHTML = `<span>&larr;</span> ODLAZAK (${shift.odlazak})`;
+
     const records = getRecords();
     const today = getTodayKey();
     const userToday = records[today] && records[today][currentWorker];
@@ -676,9 +692,11 @@
     updateWorkerDisplay();
   }
 
+  // --- AUTOMATSKO UPISIVANJE TOČNOG VREMENA ---
   async function recordAction(action) {
     const today = getTodayKey();
-    const fixedTime = (action === "Prijava") ? "08:00" : "16:00";
+    const shift = getShiftForWorker(currentWorker);
+    const fixedTime = (action === "Prijava") ? shift.dolazak : shift.odlazak;
 
     try {
       fetch(GOOGLE_SHEET_URL, {
@@ -707,10 +725,9 @@
     updateWorkerDisplay();
     renderAdminView();
 
-    alert(`✅ Zabilježeno: ${currentWorker} [${action === 'Prijava' ? 'DOLAZAK (08:00)' : 'ODLAZAK (16:00)'}]`);
+    alert(`✅ Zabilježeno: ${currentWorker} [${action === 'Prijava' ? 'DOLAZAK (' + fixedTime + ')' : 'ODLAZAK (' + fixedTime + ')'}]`);
   }
 
-  // --- UPRAVLJANJE RADNICIMA (DODAVANJE I BRISANJE) ---
   function addNewWorker() {
     if (currentUserRole !== "ADMIN") return;
     const input = document.getElementById('newWorkerName');
@@ -748,7 +765,6 @@
     alert(`🗑️ Radnik ${name} je uklonjen.`);
   }
 
-  // --- AUTENTIFIKACIJA PREMA PIN-U ---
   function openAdminPinModal() {
     document.getElementById('pinModal').classList.remove('hidden');
     document.getElementById('modalPinInput').value = '';
@@ -805,16 +821,16 @@
     document.getElementById('viewEmployee').classList.remove('hidden');
   }
 
-  // --- ADMIN PISANJE & BRISANJE SATI ---
   function adminEditRecord(worker) {
     if (currentUserRole !== "ADMIN") return;
     const records = getRecords();
     const cur = (records[selectedAdminDate] && records[selectedAdminDate][worker]) || {};
+    const shift = getShiftForWorker(worker);
 
-    const dol = prompt(`Unesite vrijeme DOLASKA za ${worker} (${selectedAdminDate}):`, cur.dolazak || "08:00");
+    const dol = prompt(`Unesite vrijeme DOLASKA za ${worker} (${selectedAdminDate}):`, cur.dolazak || shift.dolazak);
     if (dol === null) return;
 
-    const odl = prompt(`Unesite vrijeme ODLASKA za ${worker} (${selectedAdminDate}):`, cur.odlazak || "16:00");
+    const odl = prompt(`Unesite vrijeme ODLASKA za ${worker} (${selectedAdminDate}):`, cur.odlazak || shift.odlazak);
     if (odl === null) return;
 
     if (!records[selectedAdminDate]) records[selectedAdminDate] = {};
