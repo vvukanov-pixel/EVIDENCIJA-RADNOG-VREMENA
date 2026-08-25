@@ -278,17 +278,6 @@
       background: #fff;
     }
 
-    .manage-worker-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 14px;
-      background: #f8faf9;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      margin-bottom: 8px;
-    }
-
     .kpi-row {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -468,16 +457,6 @@
       </div>
     </div>
 
-    <div id="manageWorkersWrapper" class="card-box">
-      <h3>👥 Upravljanje zaposlenicima</h3>
-      <p>Dodajte nove radnike ili trajno obrišite postojeće s popisa.</p>
-      <div style="display: flex; gap: 8px; margin-bottom: 16px;">
-        <input type="text" id="newWorkerName" placeholder="Ime i prezime novog radnika..." style="flex:1; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px;">
-        <button class="btn-export" onclick="addNewWorker()">+ Dodaj zaposlenika</button>
-      </div>
-      <div id="manageWorkersList"></div>
-    </div>
-
     <div id="izostanakCardWrapper" class="card-box">
       <h3 id="izostanakHeaderTitle">Dodaj izostanak</h3>
       <p>Odaberite razlog uz zaposlenika koji nije bio na poslu za odabrani datum.</p>
@@ -487,7 +466,7 @@
     <div class="kpi-row">
       <div class="kpi-card">
         <div class="kpi-label">Aktivnih zaposlenika</div>
-        <div class="kpi-value" id="kpiAktivni">0</div>
+        <div class="kpi-value" id="kpiAktivni">11</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Došlo na posao</div>
@@ -499,7 +478,7 @@
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Nije evidentirano</div>
-        <div class="kpi-value" id="kpiNije">0</div>
+        <div class="kpi-value" id="kpiNije">11</div>
       </div>
     </div>
 
@@ -547,39 +526,24 @@
   const PIN_ADMIN = "2468";
   const PIN_KNJIGOVODJA = "1357";
 
-  const STORAGE_KEY = 'portal_montaza_workers_final';
+  // FIKSNI POPIS OD TOČNO 11 RADNIKA (BEZ BRANISLAVA BEGENUŠIĆA)
+  const WORKERS = [
+    "Vedran Vukanović",
+    "Siniša Pravica",
+    "Ljubiša Došlo",
+    "Slaven Puhalo",
+    "Ranko Janjić",
+    "Ankica Prkačin Bačić",
+    "Nikolina Burnać",
+    "Branislav Begenišić",
+    "Miodrag Ćeranić",
+    "Nikola Mrdić",
+    "Zlatko Radiš"
+  ];
 
-  function loadWorkersFromStorage() {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      try { return JSON.parse(raw); } catch(e){}
-    }
-    const defaultList = [
-      "Vedran Vukanović", "Ljubiša Došlo", "Slaven Puhalo", "Ranko Janjić",
-      "Ankica Prkačin Bačić", "Branislav Begenušić", "Nikolina Burnać",
-      "Branislav Begenišić", "Miodrag Ćeranić", "Nikola Mrdić", "Zlatko Radiš"
-    ];
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultList));
-    return defaultList;
-  }
-
-  let WORKERS = loadWorkersFromStorage();
   let currentUserRole = "NONE";
-  let currentWorker = localStorage.getItem('selected_worker') || WORKERS[0];
+  let currentWorker = localStorage.getItem('active_worker_profile_v5') || WORKERS[0];
   let selectedAdminDate = new Date().toISOString().slice(0, 10);
-
-  function saveWorkersToStorage() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(WORKERS));
-    // Slanje u Google tablicu u pozadini
-    try {
-      fetch(GOOGLE_SHEET_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "text/plain" },
-        body: JSON.stringify({ type: "MANAGE_WORKERS", workers: WORKERS })
-      });
-    } catch(e){}
-  }
 
   function getTodayKey() {
     return new Date().toISOString().slice(0, 10);
@@ -625,11 +589,9 @@
   }
 
   function updateWorkerDisplay() {
-    if (WORKERS.length === 0) {
-      currentWorker = "Nema radnika";
-    } else if (!WORKERS.includes(currentWorker)) {
+    if (!WORKERS.includes(currentWorker)) {
       currentWorker = WORKERS[0];
-      localStorage.setItem('selected_worker', currentWorker);
+      localStorage.setItem('active_worker_profile_v5', currentWorker);
     }
 
     document.getElementById('currentEmployeeDisplay').innerText = currentWorker;
@@ -678,13 +640,12 @@
 
   function saveSelectedWorker() {
     currentWorker = document.getElementById('workerModalSelect').value;
-    localStorage.setItem('selected_worker', currentWorker);
+    localStorage.setItem('active_worker_profile_v5', currentWorker);
     document.getElementById('workerModal').classList.add('hidden');
     updateWorkerDisplay();
   }
 
   async function recordAction(action) {
-    if (currentWorker === "Nema radnika") return alert("Dodajte radnike u administraciji!");
     const today = getTodayKey();
     const shift = getShiftForWorker(currentWorker);
     const fixedTime = (action === "Prijava") ? shift.dolazak : shift.odlazak;
@@ -715,42 +676,6 @@
     renderAdminView();
 
     alert(`✅ Zabilježeno: ${currentWorker} [${action === 'Prijava' ? 'DOLAZAK (' + fixedTime + ')' : 'ODLAZAK (' + fixedTime + ')'}]`);
-  }
-
-  function addNewWorker() {
-    if (currentUserRole !== "ADMIN") return;
-    const input = document.getElementById('newWorkerName');
-    const name = input.value.trim();
-    if (!name) return alert('Upišite ime i prezime zaposlenika!');
-
-    if (WORKERS.includes(name)) return alert('Taj zaposlenik već postoji!');
-
-    WORKERS.push(name);
-    saveWorkersToStorage();
-    input.value = '';
-    
-    updateWorkerDisplay();
-    populateWorkerModalSelect();
-    renderAdminView();
-    alert(`✅ Zaposlenik ${name} je trajno dodan!`);
-  }
-
-  function removeWorker(name) {
-    if (currentUserRole !== "ADMIN") return;
-    if (!confirm(`Jeste li sigurni da želite trajno obrisati radnika ${name}?`)) return;
-
-    WORKERS = WORKERS.filter(w => w !== name);
-    saveWorkersToStorage();
-
-    if (currentWorker === name) {
-      currentWorker = WORKERS[0] || "Nema radnika";
-      localStorage.setItem('selected_worker', currentWorker);
-    }
-
-    updateWorkerDisplay();
-    populateWorkerModalSelect();
-    renderAdminView();
-    alert(`🗑️ Radnik ${name} je trajno obrisan.`);
   }
 
   function openAdminPinModal() {
@@ -794,9 +719,8 @@
     const isAdmin = (currentUserRole === "ADMIN");
     
     document.getElementById('userRoleBadge').innerText = isAdmin ? "ADMINISTRATOR VEDRAN (PUNI PRISTUP)" : "KNJIGOVODSTVO (SAMO PREGLED & EXCEL)";
-    document.getElementById('userRoleDesc').innerText = isAdmin ? "Pregled evidencije po datumima s opcijama izmjene, brisanja i dodavanja radnika." : "Pregled i preuzimanje službenih Excel/CSV izvještaja.";
+    document.getElementById('userRoleDesc').innerText = isAdmin ? "Pregled evidencije po datumima s opcijama izmjene i brisanja." : "Pregled i preuzimanje službenih Excel/CSV izvještaja.";
     
-    document.getElementById('manageWorkersWrapper').classList.toggle('hidden', !isAdmin);
     document.getElementById('izostanakCardWrapper').classList.toggle('hidden', !isAdmin);
     document.getElementById('thAdminActions').classList.toggle('hidden', !isAdmin);
 
@@ -888,11 +812,9 @@
 
     const tbody = document.getElementById('adminTableBody');
     const izostanciDiv = document.getElementById('izostanciList');
-    const manageListDiv = document.getElementById('manageWorkersList');
     
     tbody.innerHTML = '';
     izostanciDiv.innerHTML = '';
-    if (manageListDiv) manageListDiv.innerHTML = '';
 
     WORKERS.forEach(worker => {
       const rec = dayData[worker] || {};
@@ -923,7 +845,7 @@
       if (isAdmin) {
         actionsCell = `
           <td style="text-align: right; white-space: nowrap;">
-            <button class="btn-table-edit" onclick="adminEditRecord('${worker}')">✏️ Uredi</button>
+            <button class="btn-table-edit" onclick="adminEditRecord('${worker}')">✏️ Uredi sate</button>
             <button class="btn-table-del" onclick="adminDeleteRecord('${worker}')" style="padding:4px 8px;">🗑️ Obriši</button>
           </td>
         `;
@@ -952,13 +874,6 @@
               <option value="Plaćeni dopust" ${currentIzostanak === 'Plaćeni dopust' ? 'selected' : ''}>Plaćeni dopust</option>
               <option value="Neopravdano" ${currentIzostanak === 'Neopravdano' ? 'selected' : ''}>Neopravdano</option>
             </select>
-          </div>
-        `;
-
-        manageListDiv.innerHTML += `
-          <div class="manage-worker-item">
-            <span style="font-weight:600; font-size:14px;">${worker}</span>
-            <button class="btn-table-del" onclick="removeWorker('${worker}')">✖ Ukloni s popisa</button>
           </div>
         `;
       }
