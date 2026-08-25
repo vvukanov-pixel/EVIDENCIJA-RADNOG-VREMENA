@@ -32,7 +32,6 @@
 
     .container { max-width: 950px; margin: 0 auto; }
 
-    /* HEADER */
     .app-header {
       display: flex;
       justify-content: space-between;
@@ -67,7 +66,6 @@
       color: var(--text-dark);
     }
 
-    /* KORISNIČKI POGLED */
     .user-hero { text-align: center; margin: 30px 0 25px; }
     .today-pill {
       font-size: 12px;
@@ -183,7 +181,7 @@
     .footer-logo-main { font-size: 38px; line-height: 1; }
     .footer-logo-sub { font-size: 12px; letter-spacing: 3px; margin-top: 4px; }
 
-    /* ADMINISTRACIJA */
+    /* ADMIN */
     .admin-top-bar {
       display: flex;
       justify-content: space-between;
@@ -200,12 +198,7 @@
     }
     .admin-title-group p { font-size: 13px; color: var(--muted); margin-top: 4px; }
     
-    .admin-actions {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
+    .admin-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
     .date-picker-container {
       display: flex;
@@ -289,7 +282,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 12px;
+      padding: 10px 14px;
       background: #f8faf9;
       border: 1px solid var(--border-color);
       border-radius: 8px;
@@ -350,15 +343,14 @@
     .btn-table-del {
       background: #fee2e2;
       border: 1px solid #fca5a5;
-      padding: 4px 8px;
+      padding: 6px 12px;
       border-radius: 6px;
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
       color: #991b1b;
     }
 
-    /* MODAL */
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.5);
       display: flex; align-items: center; justify-content: center;
@@ -402,7 +394,6 @@
 <body>
 
 <div class="container">
-  <!-- GLAVNI HEADER -->
   <header class="app-header">
     <div class="brand-group">
       <div class="brand-badge">V</div>
@@ -418,7 +409,7 @@
   <div id="viewEmployee">
     <div class="user-hero">
       <div class="today-pill" id="todayPillText">EVIDENCIJA SMJENE</div>
-      <h2 class="user-greeting">Pozdrav, <span id="currentEmployeeDisplay">Vedran Vukanović</span></h2>
+      <h2 class="user-greeting">Pozdrav, <span id="currentEmployeeDisplay">...</span></h2>
       <p class="user-subtext">Evidentirajte početak ili završetak radnog dana.</p>
     </div>
 
@@ -426,7 +417,7 @@
       <div class="user-switch-bar">
         <div>
           <div class="switch-label">Ovaj mobitel koristi</div>
-          <div class="current-user-name" id="currentEmployeeCardName">Vedran Vukanović</div>
+          <div class="current-user-name" id="currentEmployeeCardName">...</div>
         </div>
         <button class="btn-promijeni" onclick="openWorkerSelector()">Promijeni</button>
       </div>
@@ -458,7 +449,7 @@
     </div>
   </div>
 
-  <!-- ADMINISTRACIJA / DNEVNI IZVJEŠTAJ -->
+  <!-- ADMINISTRACIJA -->
   <div id="viewAdmin" class="hidden">
     <div class="admin-top-bar">
       <div class="admin-title-group">
@@ -468,19 +459,18 @@
       </div>
       <div class="admin-actions">
         <div class="date-picker-container">
-          <button class="btn-date-arrow" onclick="changeDateByDays(-1)" title="Prethodni dan">◀</button>
+          <button class="btn-date-arrow" onclick="changeDateByDays(-1)">◀</button>
           <input type="date" id="adminDatePicker" class="date-picker-input" onchange="onAdminDateChange(this.value)">
-          <button class="btn-date-arrow" onclick="changeDateByDays(1)" title="Sljedeći dan">▶</button>
+          <button class="btn-date-arrow" onclick="changeDateByDays(1)">▶</button>
         </div>
         <button class="btn-pill-action" onclick="closeAdmin()">Natrag na prijavu</button>
         <button class="btn-export" onclick="exportCSV()">Preuzmi Excel/CSV</button>
       </div>
     </div>
 
-    <!-- UPRAVLJANJE ZAPOSLENICIMA (SAMO VEDRAN) -->
     <div id="manageWorkersWrapper" class="card-box">
       <h3>👥 Upravljanje zaposlenicima</h3>
-      <p>Dodajte nove radnike u sustav ili trajno uklonite postojeće.</p>
+      <p>Dodajte nove radnike ili trajno obrišite postojeće s popisa.</p>
       <div style="display: flex; gap: 8px; margin-bottom: 16px;">
         <input type="text" id="newWorkerName" placeholder="Ime i prezime novog radnika..." style="flex:1; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px;">
         <button class="btn-export" onclick="addNewWorker()">+ Dodaj zaposlenika</button>
@@ -488,14 +478,12 @@
       <div id="manageWorkersList"></div>
     </div>
 
-    <!-- DODAJ IZOSTANAK (SAMO ZA VEDRANA) -->
     <div id="izostanakCardWrapper" class="card-box">
       <h3 id="izostanakHeaderTitle">Dodaj izostanak</h3>
       <p>Odaberite razlog uz zaposlenika koji nije bio na poslu za odabrani datum.</p>
       <div id="izostanciList"></div>
     </div>
 
-    <!-- KPI STATISTIKA -->
     <div class="kpi-row">
       <div class="kpi-card">
         <div class="kpi-label">Aktivnih zaposlenika</div>
@@ -515,7 +503,6 @@
       </div>
     </div>
 
-    <!-- TABLICA RADNIKA -->
     <div class="table-container">
       <table>
         <thead>
@@ -534,7 +521,6 @@
   </div>
 </div>
 
-<!-- MODAL ZA PIN -->
 <div id="pinModal" class="modal-overlay hidden">
   <div class="modal-card">
     <div style="font-size: 11px; font-weight: 700; color: var(--brand-green); letter-spacing: 1px; margin-bottom: 6px;">PRIJAVA U SUSTAV</div>
@@ -546,13 +532,11 @@
   </div>
 </div>
 
-<!-- MODAL ZA ODABIR RADNIKA -->
 <div id="workerModal" class="modal-overlay hidden">
   <div class="modal-card">
     <h3>Odaberite svoj profil</h3>
     <p>Odaberite ime koje će ovaj uređaj pamtiti.</p>
-    <select id="workerModalSelect" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 15px; margin-bottom: 20px;">
-    </select>
+    <select id="workerModalSelect" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 15px; margin-bottom: 20px;"></select>
     <button class="btn-modal-submit" onclick="saveSelectedWorker()">Potvrdi</button>
   </div>
 </div>
@@ -560,40 +544,42 @@
 <script>
   const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbzj4_gblGjt68M1obNJJOjnV8TN6yCu6WzuWL-BSC5aGUI_F4dLdhlph4JnPpdZ_8NyA/exec";
   
-  const PIN_ADMIN = "2468";       // Vedran
-  const PIN_KNJIGOVODJA = "1357"; // Knjigovođa
+  const PIN_ADMIN = "2468";
+  const PIN_KNJIGOVODJA = "1357";
 
-  const INITIAL_WORKERS = [
-    "Vedran Vukanović",
-    "Ljubiša Došlo",
-    "Slaven Puhalo",
-    "Ranko Janjić",
-    "Ankica Prkačin Bačić",
-    "Branislav Begenušić",
-    "Nikolina Burnać",
-    "Branislav Begenišić",
-    "Miodrag Ćeranić",
-    "Nikola Mrdić",
-    "Zlatko Radiš"
-  ];
+  const STORAGE_KEY = 'portal_montaza_workers_final';
 
-  // ISPRAVLJENO: Provjerava točno stanje u bazi tako da se obrisani radnik nikada ne vrati
-  function getWorkers() {
-    const stored = localStorage.getItem('company_workers_v2');
-    if (stored !== null) {
-      return JSON.parse(stored);
+  function loadWorkersFromStorage() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      try { return JSON.parse(raw); } catch(e){}
     }
-    localStorage.setItem('company_workers_v2', JSON.stringify(INITIAL_WORKERS));
-    return INITIAL_WORKERS;
+    const defaultList = [
+      "Vedran Vukanović", "Ljubiša Došlo", "Slaven Puhalo", "Ranko Janjić",
+      "Ankica Prkačin Bačić", "Branislav Begenušić", "Nikolina Burnać",
+      "Branislav Begenišić", "Miodrag Ćeranić", "Nikola Mrdić", "Zlatko Radiš"
+    ];
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultList));
+    return defaultList;
   }
 
-  function saveWorkers(wList) {
-    localStorage.setItem('company_workers_v2', JSON.stringify(wList));
-  }
-
+  let WORKERS = loadWorkersFromStorage();
   let currentUserRole = "NONE";
-  let currentWorker = localStorage.getItem('selected_worker') || getWorkers()[0];
-  let selectedAdminDate = getTodayKey();
+  let currentWorker = localStorage.getItem('selected_worker') || WORKERS[0];
+  let selectedAdminDate = new Date().toISOString().slice(0, 10);
+
+  function saveWorkersToStorage() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(WORKERS));
+    // Slanje u Google tablicu u pozadini
+    try {
+      fetch(GOOGLE_SHEET_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify({ type: "MANAGE_WORKERS", workers: WORKERS })
+      });
+    } catch(e){}
+  }
 
   function getTodayKey() {
     return new Date().toISOString().slice(0, 10);
@@ -639,11 +625,10 @@
   }
 
   function updateWorkerDisplay() {
-    const workers = getWorkers();
-    if (workers.length === 0) {
+    if (WORKERS.length === 0) {
       currentWorker = "Nema radnika";
-    } else if (!workers.includes(currentWorker)) {
-      currentWorker = workers[0];
+    } else if (!WORKERS.includes(currentWorker)) {
+      currentWorker = WORKERS[0];
       localStorage.setItem('selected_worker', currentWorker);
     }
 
@@ -677,7 +662,7 @@
   function populateWorkerModalSelect() {
     const sel = document.getElementById('workerModalSelect');
     sel.innerHTML = '';
-    getWorkers().forEach(w => {
+    WORKERS.forEach(w => {
       const opt = document.createElement('option');
       opt.value = w;
       opt.innerText = w;
@@ -708,12 +693,10 @@
       fetch(GOOGLE_SHEET_URL, {
         method: "POST",
         mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ worker: currentWorker, action: action, time: fixedTime, date: today })
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify({ type: "ATTENDANCE", worker: currentWorker, action: action, time: fixedTime, date: today })
       });
-    } catch(e) {
-      console.error(e);
-    }
+    } catch(e) {}
 
     const records = getRecords();
     if (!records[today]) records[today] = {};
@@ -734,18 +717,16 @@
     alert(`✅ Zabilježeno: ${currentWorker} [${action === 'Prijava' ? 'DOLAZAK (' + fixedTime + ')' : 'ODLAZAK (' + fixedTime + ')'}]`);
   }
 
-  // --- TRAJNO DODAVANJE I BRISANJE RADNIKA ---
   function addNewWorker() {
     if (currentUserRole !== "ADMIN") return;
     const input = document.getElementById('newWorkerName');
     const name = input.value.trim();
     if (!name) return alert('Upišite ime i prezime zaposlenika!');
 
-    const workers = getWorkers();
-    if (workers.includes(name)) return alert('Taj zaposlenik već postoji na popisu!');
+    if (WORKERS.includes(name)) return alert('Taj zaposlenik već postoji!');
 
-    workers.push(name);
-    saveWorkers(workers);
+    WORKERS.push(name);
+    saveWorkersToStorage();
     input.value = '';
     
     updateWorkerDisplay();
@@ -756,14 +737,13 @@
 
   function removeWorker(name) {
     if (currentUserRole !== "ADMIN") return;
-    if (!confirm(`Jeste li sigurni da želite trajno ukloniti radnika ${name}?`)) return;
+    if (!confirm(`Jeste li sigurni da želite trajno obrisati radnika ${name}?`)) return;
 
-    let workers = getWorkers();
-    workers = workers.filter(w => w !== name);
-    saveWorkers(workers);
+    WORKERS = WORKERS.filter(w => w !== name);
+    saveWorkersToStorage();
 
     if (currentWorker === name) {
-      currentWorker = workers[0] || "Nema radnika";
+      currentWorker = WORKERS[0] || "Nema radnika";
       localStorage.setItem('selected_worker', currentWorker);
     }
 
@@ -842,20 +822,17 @@
     if (odl === null) return;
 
     if (!records[selectedAdminDate]) records[selectedAdminDate] = {};
-    records[selectedAdminDate][worker] = {
-      dolazak: dol.trim(),
-      odlazak: odl.trim()
-    };
+    records[selectedAdminDate][worker] = { dolazak: dol.trim(), odlazak: odl.trim() };
 
     saveRecords(records);
     updateWorkerDisplay();
     renderAdminView();
-    alert(`✅ Uspješno ažurirani podaci za ${worker}!`);
+    alert(`✅ Ažurirano za ${worker}!`);
   }
 
   function adminDeleteRecord(worker) {
     if (currentUserRole !== "ADMIN") return;
-    if (!confirm(`Želite li potpuno obrisati dnevni unos za zaposlenika ${worker} na dan ${selectedAdminDate}?`)) return;
+    if (!confirm(`Obrisati dnevni unos za ${worker} (${selectedAdminDate})?`)) return;
 
     const records = getRecords();
     if (records[selectedAdminDate] && records[selectedAdminDate][worker]) {
@@ -863,7 +840,7 @@
       saveRecords(records);
       updateWorkerDisplay();
       renderAdminView();
-      alert(`🗑️ Obrisana evidencija za ${worker}.`);
+      alert(`🗑️ Obrisana evidencija.`);
     }
   }
 
@@ -901,7 +878,6 @@
   function renderAdminView() {
     document.getElementById('izostanakHeaderTitle').innerText = `Dodaj izostanak za ${selectedAdminDate}`;
     
-    const workers = getWorkers();
     const records = getRecords();
     const dayData = records[selectedAdminDate] || {};
     const isAdmin = (currentUserRole === "ADMIN");
@@ -918,7 +894,7 @@
     izostanciDiv.innerHTML = '';
     if (manageListDiv) manageListDiv.innerHTML = '';
 
-    workers.forEach(worker => {
+    WORKERS.forEach(worker => {
       const rec = dayData[worker] || {};
       const dolazak = rec.dolazak || '—';
       const odlazak = rec.odlazak || '—';
@@ -948,7 +924,7 @@
         actionsCell = `
           <td style="text-align: right; white-space: nowrap;">
             <button class="btn-table-edit" onclick="adminEditRecord('${worker}')">✏️ Uredi</button>
-            <button class="btn-table-del" onclick="adminDeleteRecord('${worker}')">🗑️ Obriši</button>
+            <button class="btn-table-del" onclick="adminDeleteRecord('${worker}')" style="padding:4px 8px;">🗑️ Obriši</button>
           </td>
         `;
       }
@@ -982,13 +958,13 @@
         manageListDiv.innerHTML += `
           <div class="manage-worker-item">
             <span style="font-weight:600; font-size:14px;">${worker}</span>
-            <button class="btn-table-del" onclick="removeWorker('${worker}')">✖ Ukloni radnika</button>
+            <button class="btn-table-del" onclick="removeWorker('${worker}')">✖ Ukloni s popisa</button>
           </div>
         `;
       }
     });
 
-    document.getElementById('kpiAktivni').innerText = workers.length;
+    document.getElementById('kpiAktivni').innerText = WORKERS.length;
     document.getElementById('kpiDoslo').innerText = dosloCount;
     document.getElementById('kpiZavrsilo').innerText = zavrsiloCount;
     document.getElementById('kpiNije').innerText = nijeCount;
@@ -1001,7 +977,7 @@
     let csv = "\uFEFF";
     csv += "Datum;Zaposlenik;Dolazak;Odlazak;Ukupno sati;Status\n";
 
-    getWorkers().forEach(w => {
+    WORKERS.forEach(w => {
       const rec = dayData[w] || {};
       const dol = rec.dolazak || '';
       const odl = rec.odlazak || '';
