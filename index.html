@@ -20,7 +20,6 @@
       --border-color: #e5e3dc;
       --muted: #6c7570;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
@@ -29,15 +28,15 @@
       min-height: 100vh;
       padding: 16px;
     }
-
     .container { max-width: 950px; margin: 0 auto; }
-
     .app-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 12px 0;
       margin-bottom: 24px;
+      gap: 12px;
+      flex-wrap: wrap;
     }
     .brand-group { display: flex; align-items: center; gap: 12px; }
     .brand-badge {
@@ -55,6 +54,12 @@
     }
     .brand-titles h1 { font-size: 17px; font-weight: 700; color: var(--text-dark); }
     .brand-titles p { font-size: 13px; color: var(--muted); }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    #syncStatus {
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
     .btn-admin-nav {
       background: #fff;
       border: 1px solid var(--border-color);
@@ -65,7 +70,6 @@
       cursor: pointer;
       color: var(--text-dark);
     }
-
     .user-hero { text-align: center; margin: 30px 0 25px; }
     .today-pill {
       font-size: 12px;
@@ -84,7 +88,6 @@
       margin-bottom: 10px;
     }
     .user-subtext { font-size: 14px; color: var(--muted); }
-
     .main-action-card {
       background: var(--card-bg);
       border-radius: 16px;
@@ -111,7 +114,6 @@
       font-weight: 600;
       cursor: pointer;
     }
-
     .status-box {
       background: #f2f7f4;
       border-left: 3px solid var(--brand-green);
@@ -121,7 +123,6 @@
     }
     .status-title { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
     .status-desc { font-size: 15px; font-weight: 700; color: var(--text-dark); }
-
     .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .btn-action {
       border: none;
@@ -138,11 +139,11 @@
       gap: 6px;
       transition: all 0.15s ease;
     }
+    .btn-action:disabled { opacity: 0.6; cursor: not-allowed; }
     .btn-dolazak { background-color: var(--btn-dolazak); }
     .btn-dolazak:hover { background-color: var(--btn-dolazak-hover); }
     .btn-odlazak { background-color: var(--btn-odlazak); }
     .btn-odlazak:hover { background-color: var(--btn-odlazak-hover); }
-
     .admin-fast-pin {
       display: flex;
       align-items: center;
@@ -169,7 +170,6 @@
       font-size: 13px;
       cursor: pointer;
     }
-
     .footer-logo-box {
       text-align: center;
       margin-top: 40px;
@@ -180,7 +180,6 @@
     }
     .footer-logo-main { font-size: 38px; line-height: 1; }
     .footer-logo-sub { font-size: 12px; letter-spacing: 3px; margin-top: 4px; }
-
     /* ADMIN */
     .admin-top-bar {
       display: flex;
@@ -197,9 +196,8 @@
       line-height: 1.1;
     }
     .admin-title-group p { font-size: 13px; color: var(--muted); margin-top: 4px; }
-    
-    .admin-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
+    .admin-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
     .date-picker-container {
       display: flex;
       align-items: center;
@@ -230,7 +228,6 @@
       color: var(--text-dark);
     }
     .btn-date-arrow:hover { background: #e2e0d8; }
-
     .btn-pill-action {
       background: #fff;
       border: 1px solid var(--border-color);
@@ -251,7 +248,6 @@
       font-size: 13px;
       cursor: pointer;
     }
-
     .card-box {
       background: #fff;
       border-radius: 12px;
@@ -261,7 +257,7 @@
     }
     .card-box h3 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
     .card-box p { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
-    
+
     .izostanak-row {
       display: flex;
       justify-content: space-between;
@@ -277,7 +273,6 @@
       font-size: 13px;
       background: #fff;
     }
-
     .kpi-row {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -292,7 +287,6 @@
     }
     .kpi-label { font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
     .kpi-value { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; }
-
     .table-container {
       background: #fff;
       border-radius: 12px;
@@ -339,7 +333,6 @@
       cursor: pointer;
       color: #991b1b;
     }
-
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.5);
       display: flex; align-items: center; justify-content: center;
@@ -376,12 +369,10 @@
       font-weight: 700;
       cursor: pointer;
     }
-
     .hidden { display: none !important; }
   </style>
 </head>
 <body>
-
 <div class="container">
   <header class="app-header">
     <div class="brand-group">
@@ -391,9 +382,11 @@
         <p>Jednostavno. Točno. Pregledno.</p>
       </div>
     </div>
-    <button class="btn-admin-nav" onclick="openAdminPinModal()">Administracija</button>
+    <div class="header-right">
+      <span id="syncStatus">⏳ Sinkronizacija...</span>
+      <button class="btn-admin-nav" onclick="openAdminPinModal()">Administracija</button>
+    </div>
   </header>
-
   <!-- POGLED ZA RADNIKA -->
   <div id="viewEmployee">
     <div class="user-hero">
@@ -401,7 +394,6 @@
       <h2 class="user-greeting">Pozdrav, <span id="currentEmployeeDisplay">...</span></h2>
       <p class="user-subtext">Evidentirajte početak ili završetak radnog dana.</p>
     </div>
-
     <div class="main-action-card">
       <div class="user-switch-bar">
         <div>
@@ -410,12 +402,10 @@
         </div>
         <button class="btn-promijeni" onclick="openWorkerSelector()">Promijeni</button>
       </div>
-
       <div class="status-box">
         <div class="status-title">Današnji status</div>
         <div class="status-desc" id="userStatusDesc">Nije evidentirano</div>
       </div>
-
       <div class="action-grid">
         <button class="btn-action btn-dolazak" id="btnActionDolazak" onclick="recordAction('Prijava')">
           <span>&rarr;</span> DOLAZAK (08:00)
@@ -424,20 +414,17 @@
           <span>&larr;</span> ODLAZAK (16:00)
         </button>
       </div>
-
       <div class="admin-fast-pin">
         <span style="font-size: 11px; color: var(--muted);">Pristup (Vedran PIN: 2468 / Knjigovođa PIN: 1357)</span>
         <input type="password" id="fastPinInput" placeholder="PIN">
         <button class="btn-fast-admin" onclick="checkFastPin()">Otvori izvještaje</button>
       </div>
     </div>
-
     <div class="footer-logo-box">
       <div class="footer-logo-main">PORTAL</div>
       <div class="footer-logo-sub">MONTAŽA&SERVIS d.o.o. DUBROVNIK</div>
     </div>
   </div>
-
   <!-- ADMINISTRACIJA -->
   <div id="viewAdmin" class="hidden">
     <div class="admin-top-bar">
@@ -452,17 +439,16 @@
           <input type="date" id="adminDatePicker" class="date-picker-input" onchange="onAdminDateChange(this.value)">
           <button class="btn-date-arrow" onclick="changeDateByDays(1)">▶</button>
         </div>
+        <button class="btn-pill-action" onclick="refreshAndRender()">🔄 Osvježi</button>
         <button class="btn-pill-action" onclick="closeAdmin()">Natrag na prijavu</button>
         <button class="btn-export" onclick="exportCSV()">Preuzmi Excel/CSV</button>
       </div>
     </div>
-
     <div id="izostanakCardWrapper" class="card-box">
       <h3 id="izostanakHeaderTitle">Dodaj izostanak</h3>
       <p>Odaberite razlog uz zaposlenika koji nije bio na poslu za odabrani datum.</p>
       <div id="izostanciList"></div>
     </div>
-
     <div class="kpi-row">
       <div class="kpi-card">
         <div class="kpi-label">Aktivnih zaposlenika</div>
@@ -481,7 +467,6 @@
         <div class="kpi-value" id="kpiNije">11</div>
       </div>
     </div>
-
     <div class="table-container">
       <table>
         <thead>
@@ -499,7 +484,6 @@
     </div>
   </div>
 </div>
-
 <div id="pinModal" class="modal-overlay hidden">
   <div class="modal-card">
     <div style="font-size: 11px; font-weight: 700; color: var(--brand-green); letter-spacing: 1px; margin-bottom: 6px;">PRIJAVA U SUSTAV</div>
@@ -510,7 +494,6 @@
     <button style="margin-top: 10px; background: none; border: none; color: var(--muted); cursor: pointer;" onclick="closePinModal()">Odustani</button>
   </div>
 </div>
-
 <div id="workerModal" class="modal-overlay hidden">
   <div class="modal-card">
     <h3>Odaberite svoj profil</h3>
@@ -519,13 +502,12 @@
     <button class="btn-modal-submit" onclick="saveSelectedWorker()">Potvrdi</button>
   </div>
 </div>
-
 <script>
-  const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbzj4_gblGjt68M1obNJJOjnV8TN6yCu6WzuWL-BSC5aGUI_F4dLdhlph4JnPpdZ_8NyA/exec";
-  
+  // === POVEŽI OVO NA TVOJ GOOGLE APPS SCRIPT (Deploy > Web app > .../exec) ===
+  const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyokaEAFHDgu_iavzbM11AZoI1ZEttdf17NVeVIpjygYr6L2E7awGmUZ3hiE8-ELil8zA/exec";
+
   const PIN_ADMIN = "2468";
   const PIN_KNJIGOVODJA = "1357";
-
   // FIKSNI POPIS OD TOČNO 11 RADNIKA (BEZ BRANISLAVA BEGENUŠIĆA)
   const WORKERS = [
     "Vedran Vukanović",
@@ -545,16 +527,26 @@
   let currentWorker = localStorage.getItem('active_worker_profile_v5') || WORKERS[0];
   let selectedAdminDate = new Date().toISOString().slice(0, 10);
 
+  // Svi podaci o dolascima/odlascima žive na SERVERU (Google Sheet), ne u localStorage.
+  // localStorage se koristi SAMO kao rezervna kopija za trenutke bez interneta.
+  let serverRecords = {}; // { "2026-08-30": { "Ime Prezime": {dolazak, odlazak, izostanak} } }
+  let isSyncing = false;
+
   function getTodayKey() {
     return new Date().toISOString().slice(0, 10);
   }
 
-  function getRecords() {
-    return JSON.parse(localStorage.getItem('attendance_records') || '{}');
+  function getCachedRecords() {
+    try {
+      return JSON.parse(localStorage.getItem('attendance_records_cache') || '{}');
+    } catch (e) { return {}; }
+  }
+  function setCachedRecords(data) {
+    try { localStorage.setItem('attendance_records_cache', JSON.stringify(data)); } catch (e) {}
   }
 
-  function saveRecords(data) {
-    localStorage.setItem('attendance_records', JSON.stringify(data));
+  function getRecords() {
+    return serverRecords;
   }
 
   function getShiftForWorker(name) {
@@ -567,11 +559,92 @@
     };
   }
 
-  function init() {
+  // --- KOMUNIKACIJA S GOOGLE SHEETOM ---
+
+  async function fetchServerRecords() {
+    isSyncing = true;
+    updateSyncIndicator();
+    try {
+      const res = await fetch(GOOGLE_SHEET_URL, { method: "GET" });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || "Nepoznata greška servera");
+      const grouped = {};
+      data.records.forEach(r => {
+        const date = r["Datum"];
+        const worker = r["Zaposlenik"];
+        if (!date || !worker) return;
+        if (!grouped[date]) grouped[date] = {};
+        grouped[date][worker] = {
+          dolazak: r["Dolazak"] || '',
+          odlazak: r["Odlazak"] || '',
+          izostanak: r["Izostanak"] || ''
+        };
+      });
+      serverRecords = grouped;
+      setCachedRecords(serverRecords);
+      isSyncing = false;
+      updateSyncIndicator(true, false);
+      return true;
+    } catch (err) {
+      console.error("Greška pri dohvatu podataka sa servera:", err);
+      serverRecords = getCachedRecords();
+      isSyncing = false;
+      updateSyncIndicator(false, true);
+      return false;
+    }
+  }
+
+  async function sendToServer(payload) {
+    try {
+      const res = await fetch(GOOGLE_SHEET_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || "Nepoznata greška servera");
+      return true;
+    } catch (err) {
+      console.error("Greška pri slanju podataka na server:", err);
+      alert("⚠️ Nije uspjelo spremanje na server. Provjeri internetsku vezu i pokušaj ponovno.");
+      return false;
+    }
+  }
+
+  function updateSyncIndicator(success, failed) {
+    const el = document.getElementById('syncStatus');
+    if (!el) return;
+    const now = new Date().toLocaleTimeString('hr-HR', { hour: '2-digit', minute: '2-digit' });
+    if (isSyncing) {
+      el.innerText = '⏳ Sinkronizacija...';
+    } else if (failed) {
+      el.innerText = '⚠️ Nema veze — zadnji poznati podaci';
+    } else {
+      el.innerText = `✓ Ažurirano ${now}`;
+    }
+  }
+
+  async function refreshAndRender() {
+    await fetchServerRecords();
+    updateWorkerDisplay();
+    if (currentUserRole !== "NONE") renderAdminView();
+  }
+
+  // --- INICIJALIZACIJA ---
+
+  async function init() {
     document.getElementById('adminDatePicker').value = selectedAdminDate;
+    serverRecords = getCachedRecords(); // odmah prikaži zadnje poznato, bez čekanja na mrežu
     updateWorkerDisplay();
     populateWorkerModalSelect();
     renderAdminView();
+
+    await fetchServerRecords();
+    updateWorkerDisplay();
+    renderAdminView();
+
+    // Automatsko osvježavanje svakih 20 sekundi da se promjene s drugih uređaja pojave i ovdje
+    setInterval(refreshAndRender, 20000);
   }
 
   function onAdminDateChange(val) {
@@ -579,7 +652,6 @@
     selectedAdminDate = val;
     renderAdminView();
   }
-
   function changeDateByDays(days) {
     const d = new Date(selectedAdminDate);
     d.setDate(d.getDate() + days);
@@ -587,25 +659,21 @@
     document.getElementById('adminDatePicker').value = selectedAdminDate;
     renderAdminView();
   }
-
   function updateWorkerDisplay() {
     if (!WORKERS.includes(currentWorker)) {
       currentWorker = WORKERS[0];
       localStorage.setItem('active_worker_profile_v5', currentWorker);
     }
-
     document.getElementById('currentEmployeeDisplay').innerText = currentWorker;
     document.getElementById('currentEmployeeCardName').innerText = currentWorker;
-    
+
     const shift = getShiftForWorker(currentWorker);
     document.getElementById('todayPillText').innerText = `EVIDENCIJA SMJENE (${shift.label})`;
     document.getElementById('btnActionDolazak').innerHTML = `<span>&rarr;</span> DOLAZAK (${shift.dolazak})`;
     document.getElementById('btnActionOdlazak').innerHTML = `<span>&larr;</span> ODLAZAK (${shift.odlazak})`;
-
     const records = getRecords();
     const today = getTodayKey();
     const userToday = records[today] && records[today][currentWorker];
-
     if (userToday) {
       if (userToday.izostanak) {
         document.getElementById('userStatusDesc').innerText = userToday.izostanak;
@@ -620,7 +688,6 @@
       document.getElementById('userStatusDesc').innerText = 'Nije evidentirano';
     }
   }
-
   function populateWorkerModalSelect() {
     const sel = document.getElementById('workerModalSelect');
     sel.innerHTML = '';
@@ -632,72 +699,54 @@
       sel.appendChild(opt);
     });
   }
-
   function openWorkerSelector() {
     populateWorkerModalSelect();
     document.getElementById('workerModal').classList.remove('hidden');
   }
-
   function saveSelectedWorker() {
     currentWorker = document.getElementById('workerModalSelect').value;
     localStorage.setItem('active_worker_profile_v5', currentWorker);
     document.getElementById('workerModal').classList.add('hidden');
     updateWorkerDisplay();
   }
-
   async function recordAction(action) {
     const today = getTodayKey();
     const shift = getShiftForWorker(currentWorker);
     const fixedTime = (action === "Prijava") ? shift.dolazak : shift.odlazak;
 
-    try {
-      fetch(GOOGLE_SHEET_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "text/plain" },
-        body: JSON.stringify({ type: "ATTENDANCE", worker: currentWorker, action: action, time: fixedTime, date: today })
-      });
-    } catch(e) {}
+    const btnDolazak = document.getElementById('btnActionDolazak');
+    const btnOdlazak = document.getElementById('btnActionOdlazak');
+    btnDolazak.disabled = true;
+    btnOdlazak.disabled = true;
 
-    const records = getRecords();
-    if (!records[today]) records[today] = {};
-    if (!records[today][currentWorker]) records[today][currentWorker] = {};
+    const ok = await sendToServer({ type: "ATTENDANCE", worker: currentWorker, action: action, time: fixedTime, date: today });
+    await fetchServerRecords();
 
-    delete records[today][currentWorker].izostanak;
+    btnDolazak.disabled = false;
+    btnOdlazak.disabled = false;
 
-    if (action === "Prijava") {
-      records[today][currentWorker].dolazak = fixedTime;
-    } else {
-      records[today][currentWorker].odlazak = fixedTime;
-    }
-
-    saveRecords(records);
     updateWorkerDisplay();
     renderAdminView();
-
-    alert(`✅ Zabilježeno: ${currentWorker} [${action === 'Prijava' ? 'DOLAZAK (' + fixedTime + ')' : 'ODLAZAK (' + fixedTime + ')'}]`);
+    if (ok) {
+      alert(`✅ Zabilježeno: ${currentWorker} [${action === 'Prijava' ? 'DOLAZAK (' + fixedTime + ')' : 'ODLAZAK (' + fixedTime + ')'}]`);
+    }
   }
-
   function openAdminPinModal() {
     document.getElementById('pinModal').classList.remove('hidden');
     document.getElementById('modalPinInput').value = '';
     document.getElementById('modalPinInput').focus();
   }
-
   function closePinModal() {
     document.getElementById('pinModal').classList.add('hidden');
   }
-
   function submitPinModal() {
     const pin = document.getElementById('modalPinInput').value.trim();
     handlePinAuth(pin);
   }
-
   function checkFastPin() {
     const pin = document.getElementById('fastPinInput').value.trim();
     handlePinAuth(pin);
   }
-
   function handlePinAuth(pin) {
     if (pin === PIN_ADMIN) {
       currentUserRole = "ADMIN";
@@ -711,82 +760,56 @@
       alert("❌ Pogrešan PIN!");
     }
   }
-
   function showAdminView() {
     document.getElementById('viewEmployee').classList.add('hidden');
     document.getElementById('viewAdmin').classList.remove('hidden');
-
     const isAdmin = (currentUserRole === "ADMIN");
-    
+
     document.getElementById('userRoleBadge').innerText = isAdmin ? "ADMINISTRATOR VEDRAN (PUNI PRISTUP)" : "KNJIGOVODSTVO (SAMO PREGLED & EXCEL)";
     document.getElementById('userRoleDesc').innerText = isAdmin ? "Pregled evidencije po datumima s opcijama izmjene i brisanja." : "Pregled i preuzimanje službenih Excel/CSV izvještaja.";
-    
+
     document.getElementById('izostanakCardWrapper').classList.toggle('hidden', !isAdmin);
     document.getElementById('thAdminActions').classList.toggle('hidden', !isAdmin);
-
-    renderAdminView();
+    refreshAndRender();
   }
-
   function closeAdmin() {
     currentUserRole = "NONE";
     document.getElementById('viewAdmin').classList.add('hidden');
     document.getElementById('viewEmployee').classList.remove('hidden');
   }
-
-  function adminEditRecord(worker) {
+  async function adminEditRecord(worker) {
     if (currentUserRole !== "ADMIN") return;
-    const records = getRecords();
-    const cur = (records[selectedAdminDate] && records[selectedAdminDate][worker]) || {};
+    const dayData = serverRecords[selectedAdminDate] || {};
+    const cur = dayData[worker] || {};
     const shift = getShiftForWorker(worker);
-
     const dol = prompt(`Unesite vrijeme DOLASKA za ${worker} (${selectedAdminDate}):`, cur.dolazak || shift.dolazak);
     if (dol === null) return;
-
     const odl = prompt(`Unesite vrijeme ODLASKA za ${worker} (${selectedAdminDate}):`, cur.odlazak || shift.odlazak);
     if (odl === null) return;
 
-    if (!records[selectedAdminDate]) records[selectedAdminDate] = {};
-    records[selectedAdminDate][worker] = { dolazak: dol.trim(), odlazak: odl.trim() };
-
-    saveRecords(records);
+    const ok = await sendToServer({ type: "EDIT", worker: worker, date: selectedAdminDate, dolazak: dol.trim(), odlazak: odl.trim() });
+    await fetchServerRecords();
     updateWorkerDisplay();
     renderAdminView();
-    alert(`✅ Ažurirano za ${worker}!`);
+    if (ok) alert(`✅ Ažurirano za ${worker}!`);
   }
-
-  function adminDeleteRecord(worker) {
+  async function adminDeleteRecord(worker) {
     if (currentUserRole !== "ADMIN") return;
     if (!confirm(`Obrisati dnevni unos za ${worker} (${selectedAdminDate})?`)) return;
 
-    const records = getRecords();
-    if (records[selectedAdminDate] && records[selectedAdminDate][worker]) {
-      delete records[selectedAdminDate][worker];
-      saveRecords(records);
-      updateWorkerDisplay();
-      renderAdminView();
-      alert(`🗑️ Obrisana evidencija.`);
-    }
+    const ok = await sendToServer({ type: "DELETE", worker: worker, date: selectedAdminDate });
+    await fetchServerRecords();
+    updateWorkerDisplay();
+    renderAdminView();
+    if (ok) alert(`🗑️ Obrisana evidencija.`);
   }
-
-  function setIzostanak(worker, razlog) {
+  async function setIzostanak(worker, razlog) {
     if (currentUserRole !== "ADMIN") return;
-    const records = getRecords();
-    if (!records[selectedAdminDate]) records[selectedAdminDate] = {};
-    if (!records[selectedAdminDate][worker]) records[selectedAdminDate][worker] = {};
-
-    if (razlog === "") {
-      delete records[selectedAdminDate][worker].izostanak;
-    } else {
-      records[selectedAdminDate][worker].izostanak = razlog;
-      records[selectedAdminDate][worker].dolazak = '';
-      records[selectedAdminDate][worker].odlazak = '';
-    }
-
-    saveRecords(records);
+    await sendToServer({ type: "IZOSTANAK", worker: worker, date: selectedAdminDate, razlog: razlog });
+    await fetchServerRecords();
     updateWorkerDisplay();
     renderAdminView();
   }
-
   function calcDuration(start, end) {
     if (!start || !end) return '—';
     const [h1, m1] = start.split(':').map(Number);
@@ -798,33 +821,28 @@
     const mins = diff % 60;
     return `${hours}h ${mins > 0 ? mins + 'm' : '00m'}`;
   }
-
   function renderAdminView() {
     document.getElementById('izostanakHeaderTitle').innerText = `Dodaj izostanak za ${selectedAdminDate}`;
-    
+
     const records = getRecords();
     const dayData = records[selectedAdminDate] || {};
     const isAdmin = (currentUserRole === "ADMIN");
-
     let dosloCount = 0;
     let zavrsiloCount = 0;
     let nijeCount = 0;
-
     const tbody = document.getElementById('adminTableBody');
     const izostanciDiv = document.getElementById('izostanciList');
-    
+
     tbody.innerHTML = '';
     izostanciDiv.innerHTML = '';
-
     WORKERS.forEach(worker => {
       const rec = dayData[worker] || {};
       const dolazak = rec.dolazak || '—';
       const odlazak = rec.odlazak || '—';
       const ukupno = calcDuration(rec.dolazak, rec.odlazak);
-      
+
       let status = 'Nije evidentirano';
       let badgeStyle = 'background:#f1f5f9; color:#475569;';
-
       if (rec.izostanak) {
         status = rec.izostanak;
         badgeStyle = 'background:#fef3c7; color:#92400e;';
@@ -840,7 +858,6 @@
       } else {
         nijeCount++;
       }
-
       let actionsCell = '';
       if (isAdmin) {
         actionsCell = `
@@ -850,7 +867,6 @@
           </td>
         `;
       }
-
       tbody.innerHTML += `
         <tr>
           <td><strong>${worker}</strong></td>
@@ -861,7 +877,6 @@
           ${actionsCell}
         </tr>
       `;
-
       if (isAdmin) {
         const currentIzostanak = rec.izostanak || '';
         izostanciDiv.innerHTML += `
@@ -878,27 +893,22 @@
         `;
       }
     });
-
     document.getElementById('kpiAktivni').innerText = WORKERS.length;
     document.getElementById('kpiDoslo').innerText = dosloCount;
     document.getElementById('kpiZavrsilo').innerText = zavrsiloCount;
     document.getElementById('kpiNije').innerText = nijeCount;
   }
-
   function exportCSV() {
     const records = getRecords();
     const dayData = records[selectedAdminDate] || {};
-
-    let csv = "\uFEFF";
+    let csv = "﻿";
     csv += "Datum;Zaposlenik;Dolazak;Odlazak;Ukupno sati;Status\n";
-
     WORKERS.forEach(w => {
       const rec = dayData[w] || {};
       const dol = rec.dolazak || '';
       const odl = rec.odlazak || '';
       const ukupno = calcDuration(rec.dolazak, rec.odlazak);
       let status = 'Nije evidentirano';
-
       if (rec.izostanak) {
         status = rec.izostanak;
       } else if (dol && !odl) {
@@ -906,10 +916,8 @@
       } else if (dol && odl) {
         status = 'Završio smjenu';
       }
-
       csv += `"${selectedAdminDate}";"${w}";"${dol}";"${odl}";"${ukupno === '—' ? '' : ukupno}";"${status}"\n`;
     });
-
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
@@ -919,9 +927,7 @@
     link.click();
     document.body.removeChild(link);
   }
-
   init();
 </script>
-
 </body>
 </html>
