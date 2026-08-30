@@ -1,933 +1,140 @@
-<!DOCTYPE html>
-<html lang="hr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Evidencija radnog vremena - PORTAL MONTAŽA&SERVIS</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg-warm: #f6f4ee;
-      --card-bg: #ffffff;
-      --text-dark: #1b241e;
-      --brand-green: #1b4332;
-      --btn-dolazak: #a3c2b1;
-      --btn-dolazak-hover: #8eaf9d;
-      --btn-odlazak: #a84b42;
-      --btn-odlazak-hover: #8f3e36;
-      --border-color: #e5e3dc;
-      --muted: #6c7570;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: var(--bg-warm);
-      color: var(--text-dark);
-      min-height: 100vh;
-      padding: 16px;
-    }
-    .container { max-width: 950px; margin: 0 auto; }
-    .app-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 0;
-      margin-bottom: 24px;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .brand-group { display: flex; align-items: center; gap: 12px; }
-    .brand-badge {
-      background: var(--brand-green);
-      color: #fff;
-      font-family: 'Playfair Display', serif;
-      font-weight: 700;
-      font-size: 22px;
-      width: 44px;
-      height: 44px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .brand-titles h1 { font-size: 17px; font-weight: 700; color: var(--text-dark); }
-    .brand-titles p { font-size: 13px; color: var(--muted); }
-    .header-right { display: flex; align-items: center; gap: 12px; }
-    #syncStatus {
-      font-size: 12px;
-      color: var(--muted);
-      white-space: nowrap;
-    }
-    .btn-admin-nav {
-      background: #fff;
-      border: 1px solid var(--border-color);
-      padding: 8px 18px;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 13px;
-      cursor: pointer;
-      color: var(--text-dark);
-    }
-    .user-hero { text-align: center; margin: 30px 0 25px; }
-    .today-pill {
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      color: var(--brand-green);
-      text-transform: uppercase;
-      margin-bottom: 8px;
-    }
-    .user-greeting {
-      font-family: 'Playfair Display', serif;
-      font-size: 38px;
-      font-weight: 700;
-      line-height: 1.15;
-      color: var(--text-dark);
-      margin-bottom: 10px;
-    }
-    .user-subtext { font-size: 14px; color: var(--muted); }
-    .main-action-card {
-      background: var(--card-bg);
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-      border: 1px solid var(--border-color);
-      max-width: 540px;
-      margin: 0 auto 30px;
-    }
-    .user-switch-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-    .switch-label { font-size: 12px; color: var(--muted); }
-    .current-user-name { font-size: 16px; font-weight: 700; color: var(--text-dark); }
-    .btn-promijeni {
-      background: #f1f0ea;
-      border: 1px solid var(--border-color);
-      padding: 6px 14px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .status-box {
-      background: #f2f7f4;
-      border-left: 3px solid var(--brand-green);
-      padding: 14px 16px;
-      border-radius: 6px;
-      margin-bottom: 20px;
-    }
-    .status-title { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
-    .status-desc { font-size: 15px; font-weight: 700; color: var(--text-dark); }
-    .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .btn-action {
-      border: none;
-      padding: 16px 12px;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      color: #ffffff;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: all 0.15s ease;
-    }
-    .btn-action:disabled { opacity: 0.6; cursor: not-allowed; }
-    .btn-dolazak { background-color: var(--btn-dolazak); }
-    .btn-dolazak:hover { background-color: var(--btn-dolazak-hover); }
-    .btn-odlazak { background-color: var(--btn-odlazak); }
-    .btn-odlazak:hover { background-color: var(--btn-odlazak-hover); }
-    .admin-fast-pin {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      margin-top: 20px;
-    }
-    .admin-fast-pin input {
-      padding: 8px 12px;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      width: 90px;
-      text-align: center;
-      font-size: 14px;
-      background: #fff;
-    }
-    .btn-fast-admin {
-      background: var(--text-dark);
-      color: #fff;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 6px;
-      font-weight: 600;
-      font-size: 13px;
-      cursor: pointer;
-    }
-    .footer-logo-box {
-      text-align: center;
-      margin-top: 40px;
-      opacity: 0.28;
-      font-family: Arial, Helvetica, sans-serif;
-      font-weight: 900;
-      letter-spacing: 2px;
-    }
-    .footer-logo-main { font-size: 38px; line-height: 1; }
-    .footer-logo-sub { font-size: 12px; letter-spacing: 3px; margin-top: 4px; }
-    /* ADMIN */
-    .admin-top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-    .admin-title-group h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: 34px;
-      font-weight: 700;
-      line-height: 1.1;
-    }
-    .admin-title-group p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+/**
+ * BACKEND (Google Apps Script) za "Evidencija radnog vremena".
+ *
+ * ŠTO OVO RADI:
+ * - doGet()  -> vraća SVE zapise iz Google Sheeta kao JSON (čitanje).
+ * - doPost() -> prima zapis s mobitela/računala i upisuje/ažurira ga u Google Sheetu (pisanje).
+ *
+ * Zahvaljujući ovome, Google Sheet postaje ZAJEDNIČKA baza podataka za sve uređaje —
+ * mobitel radnika i računalo knjigovođe gledaju ISTE podatke.
+ *
+ * KAKO POSTAVITI:
+ * 1. Otvori Google Sheet koji želiš koristiti kao bazu (može biti prazan, novi Sheet).
+ * 2. Extensions > Apps Script.
+ * 3. Obriši sve što piše u Code.gs i zalijepi CIJELI sadržaj ove datoteke.
+ * 4. Deploy > New deployment (ili, ako mijenjaš POSTOJEĆI deployment: Deploy > Manage deployments > ✏️ > Version: "New version").
+ *    - Type: Web app
+ *    - Execute as: Me
+ *    - Who has access: Anyone
+ * 5. Deploy. Prvi put će tražiti autorizaciju — odobri (Advanced > Go to project (unsafe) je normalno za vlastiti skript).
+ * 6. Kopiraj URL koji završava na /exec — to je tvoj GOOGLE_SHEET_URL.
+ *    (Ako si samo napravio "New version" na POSTOJEĆEM deploymentu, URL ostaje ISTI kao prije —
+ *     tada NE moraš ništa mijenjati u index.html.)
+ */
 
-    .admin-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-    .date-picker-container {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: #fff;
-      border: 1px solid var(--border-color);
-      padding: 4px 8px;
-      border-radius: 8px;
-    }
-    .date-picker-input {
-      border: none;
-      font-family: inherit;
-      font-weight: 700;
-      font-size: 14px;
-      color: var(--brand-green);
-      outline: none;
-      background: transparent;
-      cursor: pointer;
-      padding: 4px;
-    }
-    .btn-date-arrow {
-      background: #f1f0eb;
-      border: none;
-      border-radius: 4px;
-      padding: 4px 8px;
-      font-weight: bold;
-      cursor: pointer;
-      color: var(--text-dark);
-    }
-    .btn-date-arrow:hover { background: #e2e0d8; }
-    .btn-pill-action {
-      background: #fff;
-      border: 1px solid var(--border-color);
-      padding: 9px 16px;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 13px;
-      cursor: pointer;
-      color: var(--text-dark);
-    }
-    .btn-export {
-      background: var(--brand-green);
-      color: #fff;
-      border: none;
-      padding: 9px 20px;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 13px;
-      cursor: pointer;
-    }
-    .card-box {
-      background: #fff;
-      border-radius: 12px;
-      padding: 20px;
-      border: 1px solid var(--border-color);
-      margin-bottom: 24px;
-    }
-    .card-box h3 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-    .card-box p { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+const SHEET_NAME = "Records";
 
-    .izostanak-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid #f1f0eb;
-    }
-    .izostanak-row:last-child { border-bottom: none; }
-    .izostanak-row select {
-      padding: 8px 12px;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      font-size: 13px;
-      background: #fff;
-    }
-    .kpi-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      margin-bottom: 24px;
-    }
-    .kpi-card {
-      background: #fff;
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 16px;
-    }
-    .kpi-label { font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
-    .kpi-value { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; }
-    .table-container {
-      background: #fff;
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-      overflow-x: auto;
-      padding: 12px 16px;
-    }
-    table { width: 100%; border-collapse: collapse; text-align: left; }
-    th {
-      font-size: 11px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: var(--muted);
-      padding: 12px 8px;
-      border-bottom: 1px solid var(--border-color);
-    }
-    td { padding: 14px 8px; font-size: 14px; border-bottom: 1px solid #f4f3ef; vertical-align: middle; }
-    tr:last-child td { border-bottom: none; }
-    .badge-status {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-    .btn-table-edit {
-      background: #f1f5f9;
-      border: 1px solid #cbd5e1;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      color: #334155;
-      margin-right: 4px;
-    }
-    .btn-table-del {
-      background: #fee2e2;
-      border: 1px solid #fca5a5;
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      color: #991b1b;
-    }
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 100; padding: 16px;
-    }
-    .modal-card {
-      background: #fff;
-      border-radius: 16px;
-      padding: 24px;
-      width: 100%;
-      max-width: 400px;
-      text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    }
-    .modal-card h3 { font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 8px; }
-    .modal-card p { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
-    .modal-input {
-      width: 100%;
-      padding: 14px;
-      border: 2px solid var(--border-color);
-      border-radius: 8px;
-      font-size: 20px;
-      text-align: center;
-      letter-spacing: 6px;
-      margin-bottom: 16px;
-    }
-    .btn-modal-submit {
-      width: 100%;
-      background: var(--brand-green);
-      color: #fff;
-      border: none;
-      padding: 14px;
-      border-radius: 8px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    .hidden { display: none !important; }
-  </style>
-</head>
-<body>
-<div class="container">
-  <header class="app-header">
-    <div class="brand-group">
-      <div class="brand-badge">V</div>
-      <div class="brand-titles">
-        <h1>Evidencija radnog vremena</h1>
-        <p>Jednostavno. Točno. Pregledno.</p>
-      </div>
-    </div>
-    <div class="header-right">
-      <span id="syncStatus">⏳ Sinkronizacija...</span>
-      <button class="btn-admin-nav" onclick="openAdminPinModal()">Administracija</button>
-    </div>
-  </header>
-  <!-- POGLED ZA RADNIKA -->
-  <div id="viewEmployee">
-    <div class="user-hero">
-      <div class="today-pill" id="todayPillText">EVIDENCIJA SMJENE</div>
-      <h2 class="user-greeting">Pozdrav, <span id="currentEmployeeDisplay">...</span></h2>
-      <p class="user-subtext">Evidentirajte početak ili završetak radnog dana.</p>
-    </div>
-    <div class="main-action-card">
-      <div class="user-switch-bar">
-        <div>
-          <div class="switch-label">Ovaj mobitel koristi</div>
-          <div class="current-user-name" id="currentEmployeeCardName">...</div>
-        </div>
-        <button class="btn-promijeni" onclick="openWorkerSelector()">Promijeni</button>
-      </div>
-      <div class="status-box">
-        <div class="status-title">Današnji status</div>
-        <div class="status-desc" id="userStatusDesc">Nije evidentirano</div>
-      </div>
-      <div class="action-grid">
-        <button class="btn-action btn-dolazak" id="btnActionDolazak" onclick="recordAction('Prijava')">
-          <span>&rarr;</span> DOLAZAK (08:00)
-        </button>
-        <button class="btn-action btn-odlazak" id="btnActionOdlazak" onclick="recordAction('Odjava')">
-          <span>&larr;</span> ODLAZAK (16:00)
-        </button>
-      </div>
-      <div class="admin-fast-pin">
-        <span style="font-size: 11px; color: var(--muted);">Pristup (Vedran PIN: 2468 / Knjigovođa PIN: 1357)</span>
-        <input type="password" id="fastPinInput" placeholder="PIN">
-        <button class="btn-fast-admin" onclick="checkFastPin()">Otvori izvještaje</button>
-      </div>
-    </div>
-    <div class="footer-logo-box">
-      <div class="footer-logo-main">PORTAL</div>
-      <div class="footer-logo-sub">MONTAŽA&SERVIS d.o.o. DUBROVNIK</div>
-    </div>
-  </div>
-  <!-- ADMINISTRACIJA -->
-  <div id="viewAdmin" class="hidden">
-    <div class="admin-top-bar">
-      <div class="admin-title-group">
-        <div id="userRoleBadge" style="font-size: 11px; font-weight: 700; color: var(--brand-green); letter-spacing: 1px; margin-bottom: 4px;">ADMINISTRATOR VEDRAN</div>
-        <h2>Dnevni izvještaj</h2>
-        <p id="userRoleDesc">Pregled evidencije po datumima s opcijama izmjene i brisanja.</p>
-      </div>
-      <div class="admin-actions">
-        <div class="date-picker-container">
-          <button class="btn-date-arrow" onclick="changeDateByDays(-1)">◀</button>
-          <input type="date" id="adminDatePicker" class="date-picker-input" onchange="onAdminDateChange(this.value)">
-          <button class="btn-date-arrow" onclick="changeDateByDays(1)">▶</button>
-        </div>
-        <button class="btn-pill-action" onclick="refreshAndRender()">🔄 Osvježi</button>
-        <button class="btn-pill-action" onclick="closeAdmin()">Natrag na prijavu</button>
-        <button class="btn-export" onclick="exportCSV()">Preuzmi Excel/CSV</button>
-      </div>
-    </div>
-    <div id="izostanakCardWrapper" class="card-box">
-      <h3 id="izostanakHeaderTitle">Dodaj izostanak</h3>
-      <p>Odaberite razlog uz zaposlenika koji nije bio na poslu za odabrani datum.</p>
-      <div id="izostanciList"></div>
-    </div>
-    <div class="kpi-row">
-      <div class="kpi-card">
-        <div class="kpi-label">Aktivnih zaposlenika</div>
-        <div class="kpi-value" id="kpiAktivni">11</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Došlo na posao</div>
-        <div class="kpi-value" id="kpiDoslo">0</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Završilo smjenu</div>
-        <div class="kpi-value" id="kpiZavrsilo">0</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Nije evidentirano</div>
-        <div class="kpi-value" id="kpiNije">11</div>
-      </div>
-    </div>
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Zaposlenik</th>
-            <th>Dolazak</th>
-            <th>Odlazak</th>
-            <th>Ukupno</th>
-            <th>Status</th>
-            <th id="thAdminActions" style="text-align: right;">Admin Radnje</th>
-          </tr>
-        </thead>
-        <tbody id="adminTableBody"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-<div id="pinModal" class="modal-overlay hidden">
-  <div class="modal-card">
-    <div style="font-size: 11px; font-weight: 700; color: var(--brand-green); letter-spacing: 1px; margin-bottom: 6px;">PRIJAVA U SUSTAV</div>
-    <h3>Unesite PIN</h3>
-    <p>Unesite PIN za Administratora (2468) ili Knjigovodstvo (1357).</p>
-    <input type="password" id="modalPinInput" class="modal-input" placeholder="PIN" autofocus>
-    <button class="btn-modal-submit" onclick="submitPinModal()">Otvori sustav</button>
-    <button style="margin-top: 10px; background: none; border: none; color: var(--muted); cursor: pointer;" onclick="closePinModal()">Odustani</button>
-  </div>
-</div>
-<div id="workerModal" class="modal-overlay hidden">
-  <div class="modal-card">
-    <h3>Odaberite svoj profil</h3>
-    <p>Odaberite ime koje će ovaj uređaj pamtiti.</p>
-    <select id="workerModalSelect" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 15px; margin-bottom: 20px;"></select>
-    <button class="btn-modal-submit" onclick="saveSelectedWorker()">Potvrdi</button>
-  </div>
-</div>
-<script>
-  // === POVEŽI OVO NA TVOJ GOOGLE APPS SCRIPT (Deploy > Web app > .../exec) ===
-  const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyokaEAFHDgu_iavzbM11AZoI1ZEttdf17NVeVIpjygYr6L2E7awGmUZ3hiE8-ELil8zA/exec";
+function doGet(e) {
+  const sheet = getSheet_();
+  const data = sheet.getDataRange().getValues();
+  const headers = data.shift();
+  const records = data
+    .map(function (row) {
+      const obj = {};
+      headers.forEach(function (h, i) { obj[h] = row[i]; });
+      return obj;
+    })
+    .filter(function (r) { return r["Datum"]; });
 
-  const PIN_ADMIN = "2468";
-  const PIN_KNJIGOVODJA = "1357";
-  // FIKSNI POPIS OD TOČNO 11 RADNIKA (BEZ BRANISLAVA BEGENUŠIĆA)
-  const WORKERS = [
-    "Vedran Vukanović",
-    "Siniša Pravica",
-    "Ljubiša Došlo",
-    "Slaven Puhalo",
-    "Ranko Janjić",
-    "Ankica Prkačin Bačić",
-    "Nikolina Burnać",
-    "Branislav Begenišić",
-    "Miodrag Ćeranić",
-    "Nikola Mrdić",
-    "Zlatko Radiš"
-  ];
+  const payload = JSON.stringify({ ok: true, records: records });
 
-  let currentUserRole = "NONE";
-  let currentWorker = localStorage.getItem('active_worker_profile_v5') || WORKERS[0];
-  let selectedAdminDate = new Date().toISOString().slice(0, 10);
-
-  // Svi podaci o dolascima/odlascima žive na SERVERU (Google Sheet), ne u localStorage.
-  // localStorage se koristi SAMO kao rezervna kopija za trenutke bez interneta.
-  let serverRecords = {}; // { "2026-08-30": { "Ime Prezime": {dolazak, odlazak, izostanak} } }
-  let isSyncing = false;
-
-  function getTodayKey() {
-    return new Date().toISOString().slice(0, 10);
+  // JSONP: Google Apps Script ne može slati Access-Control-Allow-Origin zaglavlje,
+  // pa obični fetch() s druge domene (npr. GitHub Pages) blokira CORS.
+  // Ako klijent pošalje ?callback=..., vraćamo odgovor omotan u tu funkciju
+  // i klijent ga učitava preko <script> taga, što CORS pravila zaobilazi.
+  const callback = e && e.parameter && e.parameter.callback;
+  if (callback) {
+    return ContentService
+      .createTextOutput(callback + "(" + payload + ")")
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
   }
 
-  function getCachedRecords() {
-    try {
-      return JSON.parse(localStorage.getItem('attendance_records_cache') || '{}');
-    } catch (e) { return {}; }
-  }
-  function setCachedRecords(data) {
-    try { localStorage.setItem('attendance_records_cache', JSON.stringify(data)); } catch (e) {}
-  }
+  return ContentService
+    .createTextOutput(payload)
+    .setMimeType(ContentService.MimeType.JSON);
+}
 
-  function getRecords() {
-    return serverRecords;
-  }
+function doPost(e) {
+  try {
+    const payload = JSON.parse(e.postData.contents);
+    const sheet = getSheet_();
+    const type = payload.type;
 
-  function getShiftForWorker(name) {
-    if (!name) return { dolazak: "08:00", odlazak: "16:00", label: "08:00 - 16:00" };
-    const isAnkica = name.toLowerCase().includes("ankica");
-    return {
-      dolazak: isAnkica ? "09:00" : "08:00",
-      odlazak: isAnkica ? "13:00" : "16:00",
-      label: isAnkica ? "09:00 - 13:00" : "08:00 - 16:00"
-    };
-  }
-
-  // --- KOMUNIKACIJA S GOOGLE SHEETOM ---
-
-  async function fetchServerRecords() {
-    isSyncing = true;
-    updateSyncIndicator();
-    try {
-      const res = await fetch(GOOGLE_SHEET_URL, { method: "GET" });
-      const data = await res.json();
-      if (!data.ok) throw new Error(data.error || "Nepoznata greška servera");
-      const grouped = {};
-      data.records.forEach(r => {
-        const date = r["Datum"];
-        const worker = r["Zaposlenik"];
-        if (!date || !worker) return;
-        if (!grouped[date]) grouped[date] = {};
-        grouped[date][worker] = {
-          dolazak: r["Dolazak"] || '',
-          odlazak: r["Odlazak"] || '',
-          izostanak: r["Izostanak"] || ''
-        };
+    if (type === "ATTENDANCE") {
+      const changes = { clearIzostanak: true };
+      if (payload.action === "Prijava") changes.dolazak = payload.time;
+      if (payload.action === "Odjava") changes.odlazak = payload.time;
+      upsertRow_(sheet, payload.date, payload.worker, changes);
+    } else if (type === "IZOSTANAK") {
+      upsertRow_(sheet, payload.date, payload.worker, {
+        izostanak: payload.razlog,
+        clearTimes: payload.razlog !== ""
       });
-      serverRecords = grouped;
-      setCachedRecords(serverRecords);
-      isSyncing = false;
-      updateSyncIndicator(true, false);
-      return true;
-    } catch (err) {
-      console.error("Greška pri dohvatu podataka sa servera:", err);
-      serverRecords = getCachedRecords();
-      isSyncing = false;
-      updateSyncIndicator(false, true);
-      return false;
-    }
-  }
-
-  async function sendToServer(payload) {
-    try {
-      const res = await fetch(GOOGLE_SHEET_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain" },
-        body: JSON.stringify(payload)
+    } else if (type === "EDIT") {
+      upsertRow_(sheet, payload.date, payload.worker, {
+        dolazak: payload.dolazak,
+        odlazak: payload.odlazak,
+        clearIzostanak: true
       });
-      const data = await res.json();
-      if (!data.ok) throw new Error(data.error || "Nepoznata greška servera");
-      return true;
-    } catch (err) {
-      console.error("Greška pri slanju podataka na server:", err);
-      alert("⚠️ Nije uspjelo spremanje na server. Provjeri internetsku vezu i pokušaj ponovno.");
-      return false;
-    }
-  }
-
-  function updateSyncIndicator(success, failed) {
-    const el = document.getElementById('syncStatus');
-    if (!el) return;
-    const now = new Date().toLocaleTimeString('hr-HR', { hour: '2-digit', minute: '2-digit' });
-    if (isSyncing) {
-      el.innerText = '⏳ Sinkronizacija...';
-    } else if (failed) {
-      el.innerText = '⚠️ Nema veze — zadnji poznati podaci';
+    } else if (type === "DELETE") {
+      deleteRow_(sheet, payload.date, payload.worker);
     } else {
-      el.innerText = `✓ Ažurirano ${now}`;
+      throw new Error("Nepoznat tip zahtjeva: " + type);
+    }
+
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: true }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: false, error: String(err) }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function getSheet_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(SHEET_NAME);
+    sheet.appendRow(["Datum", "Zaposlenik", "Dolazak", "Odlazak", "Izostanak", "Zadnja izmjena"]);
+  }
+  return sheet;
+}
+
+function findRow_(sheet, date, worker) {
+  const data = sheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][0]) === String(date) && String(data[i][1]) === String(worker)) {
+      return i + 1; // 1-indeksirani redak u Sheetu
     }
   }
+  return -1;
+}
 
-  async function refreshAndRender() {
-    await fetchServerRecords();
-    updateWorkerDisplay();
-    if (currentUserRole !== "NONE") renderAdminView();
-  }
+function upsertRow_(sheet, date, worker, changes) {
+  let rowIndex = findRow_(sheet, date, worker);
+  const now = new Date();
 
-  // --- INICIJALIZACIJA ---
-
-  async function init() {
-    document.getElementById('adminDatePicker').value = selectedAdminDate;
-    serverRecords = getCachedRecords(); // odmah prikaži zadnje poznato, bez čekanja na mrežu
-    updateWorkerDisplay();
-    populateWorkerModalSelect();
-    renderAdminView();
-
-    await fetchServerRecords();
-    updateWorkerDisplay();
-    renderAdminView();
-
-    // Automatsko osvježavanje svakih 20 sekundi da se promjene s drugih uređaja pojave i ovdje
-    setInterval(refreshAndRender, 20000);
+  if (rowIndex === -1) {
+    sheet.appendRow([date, worker, "", "", "", now]);
+    rowIndex = sheet.getLastRow();
   }
 
-  function onAdminDateChange(val) {
-    if (!val) return;
-    selectedAdminDate = val;
-    renderAdminView();
-  }
-  function changeDateByDays(days) {
-    const d = new Date(selectedAdminDate);
-    d.setDate(d.getDate() + days);
-    selectedAdminDate = d.toISOString().slice(0, 10);
-    document.getElementById('adminDatePicker').value = selectedAdminDate;
-    renderAdminView();
-  }
-  function updateWorkerDisplay() {
-    if (!WORKERS.includes(currentWorker)) {
-      currentWorker = WORKERS[0];
-      localStorage.setItem('active_worker_profile_v5', currentWorker);
-    }
-    document.getElementById('currentEmployeeDisplay').innerText = currentWorker;
-    document.getElementById('currentEmployeeCardName').innerText = currentWorker;
+  const range = sheet.getRange(rowIndex, 1, 1, 6);
+  const values = range.getValues()[0];
 
-    const shift = getShiftForWorker(currentWorker);
-    document.getElementById('todayPillText').innerText = `EVIDENCIJA SMJENE (${shift.label})`;
-    document.getElementById('btnActionDolazak').innerHTML = `<span>&rarr;</span> DOLAZAK (${shift.dolazak})`;
-    document.getElementById('btnActionOdlazak').innerHTML = `<span>&larr;</span> ODLAZAK (${shift.odlazak})`;
-    const records = getRecords();
-    const today = getTodayKey();
-    const userToday = records[today] && records[today][currentWorker];
-    if (userToday) {
-      if (userToday.izostanak) {
-        document.getElementById('userStatusDesc').innerText = userToday.izostanak;
-      } else if (userToday.odlazak) {
-        document.getElementById('userStatusDesc').innerText = `Završeno (${userToday.dolazak} - ${userToday.odlazak})`;
-      } else if (userToday.dolazak) {
-        document.getElementById('userStatusDesc').innerText = `Na poslu od ${userToday.dolazak}`;
-      } else {
-        document.getElementById('userStatusDesc').innerText = 'Nije evidentirano';
-      }
-    } else {
-      document.getElementById('userStatusDesc').innerText = 'Nije evidentirano';
-    }
-  }
-  function populateWorkerModalSelect() {
-    const sel = document.getElementById('workerModalSelect');
-    sel.innerHTML = '';
-    WORKERS.forEach(w => {
-      const opt = document.createElement('option');
-      opt.value = w;
-      opt.innerText = w;
-      if (w === currentWorker) opt.selected = true;
-      sel.appendChild(opt);
-    });
-  }
-  function openWorkerSelector() {
-    populateWorkerModalSelect();
-    document.getElementById('workerModal').classList.remove('hidden');
-  }
-  function saveSelectedWorker() {
-    currentWorker = document.getElementById('workerModalSelect').value;
-    localStorage.setItem('active_worker_profile_v5', currentWorker);
-    document.getElementById('workerModal').classList.add('hidden');
-    updateWorkerDisplay();
-  }
-  async function recordAction(action) {
-    const today = getTodayKey();
-    const shift = getShiftForWorker(currentWorker);
-    const fixedTime = (action === "Prijava") ? shift.dolazak : shift.odlazak;
+  if (changes.dolazak !== undefined) values[2] = changes.dolazak;
+  if (changes.odlazak !== undefined) values[3] = changes.odlazak;
+  if (changes.izostanak !== undefined) values[4] = changes.izostanak;
+  if (changes.clearIzostanak) values[4] = "";
+  if (changes.clearTimes) { values[2] = ""; values[3] = ""; }
+  values[5] = now;
 
-    const btnDolazak = document.getElementById('btnActionDolazak');
-    const btnOdlazak = document.getElementById('btnActionOdlazak');
-    btnDolazak.disabled = true;
-    btnOdlazak.disabled = true;
+  range.setValues([values]);
+}
 
-    const ok = await sendToServer({ type: "ATTENDANCE", worker: currentWorker, action: action, time: fixedTime, date: today });
-    await fetchServerRecords();
-
-    btnDolazak.disabled = false;
-    btnOdlazak.disabled = false;
-
-    updateWorkerDisplay();
-    renderAdminView();
-    if (ok) {
-      alert(`✅ Zabilježeno: ${currentWorker} [${action === 'Prijava' ? 'DOLAZAK (' + fixedTime + ')' : 'ODLAZAK (' + fixedTime + ')'}]`);
-    }
-  }
-  function openAdminPinModal() {
-    document.getElementById('pinModal').classList.remove('hidden');
-    document.getElementById('modalPinInput').value = '';
-    document.getElementById('modalPinInput').focus();
-  }
-  function closePinModal() {
-    document.getElementById('pinModal').classList.add('hidden');
-  }
-  function submitPinModal() {
-    const pin = document.getElementById('modalPinInput').value.trim();
-    handlePinAuth(pin);
-  }
-  function checkFastPin() {
-    const pin = document.getElementById('fastPinInput').value.trim();
-    handlePinAuth(pin);
-  }
-  function handlePinAuth(pin) {
-    if (pin === PIN_ADMIN) {
-      currentUserRole = "ADMIN";
-      closePinModal();
-      showAdminView();
-    } else if (pin === PIN_KNJIGOVODJA) {
-      currentUserRole = "KNJIGOVODJA";
-      closePinModal();
-      showAdminView();
-    } else {
-      alert("❌ Pogrešan PIN!");
-    }
-  }
-  function showAdminView() {
-    document.getElementById('viewEmployee').classList.add('hidden');
-    document.getElementById('viewAdmin').classList.remove('hidden');
-    const isAdmin = (currentUserRole === "ADMIN");
-
-    document.getElementById('userRoleBadge').innerText = isAdmin ? "ADMINISTRATOR VEDRAN (PUNI PRISTUP)" : "KNJIGOVODSTVO (SAMO PREGLED & EXCEL)";
-    document.getElementById('userRoleDesc').innerText = isAdmin ? "Pregled evidencije po datumima s opcijama izmjene i brisanja." : "Pregled i preuzimanje službenih Excel/CSV izvještaja.";
-
-    document.getElementById('izostanakCardWrapper').classList.toggle('hidden', !isAdmin);
-    document.getElementById('thAdminActions').classList.toggle('hidden', !isAdmin);
-    refreshAndRender();
-  }
-  function closeAdmin() {
-    currentUserRole = "NONE";
-    document.getElementById('viewAdmin').classList.add('hidden');
-    document.getElementById('viewEmployee').classList.remove('hidden');
-  }
-  async function adminEditRecord(worker) {
-    if (currentUserRole !== "ADMIN") return;
-    const dayData = serverRecords[selectedAdminDate] || {};
-    const cur = dayData[worker] || {};
-    const shift = getShiftForWorker(worker);
-    const dol = prompt(`Unesite vrijeme DOLASKA za ${worker} (${selectedAdminDate}):`, cur.dolazak || shift.dolazak);
-    if (dol === null) return;
-    const odl = prompt(`Unesite vrijeme ODLASKA za ${worker} (${selectedAdminDate}):`, cur.odlazak || shift.odlazak);
-    if (odl === null) return;
-
-    const ok = await sendToServer({ type: "EDIT", worker: worker, date: selectedAdminDate, dolazak: dol.trim(), odlazak: odl.trim() });
-    await fetchServerRecords();
-    updateWorkerDisplay();
-    renderAdminView();
-    if (ok) alert(`✅ Ažurirano za ${worker}!`);
-  }
-  async function adminDeleteRecord(worker) {
-    if (currentUserRole !== "ADMIN") return;
-    if (!confirm(`Obrisati dnevni unos za ${worker} (${selectedAdminDate})?`)) return;
-
-    const ok = await sendToServer({ type: "DELETE", worker: worker, date: selectedAdminDate });
-    await fetchServerRecords();
-    updateWorkerDisplay();
-    renderAdminView();
-    if (ok) alert(`🗑️ Obrisana evidencija.`);
-  }
-  async function setIzostanak(worker, razlog) {
-    if (currentUserRole !== "ADMIN") return;
-    await sendToServer({ type: "IZOSTANAK", worker: worker, date: selectedAdminDate, razlog: razlog });
-    await fetchServerRecords();
-    updateWorkerDisplay();
-    renderAdminView();
-  }
-  function calcDuration(start, end) {
-    if (!start || !end) return '—';
-    const [h1, m1] = start.split(':').map(Number);
-    const [h2, m2] = end.split(':').map(Number);
-    if (isNaN(h1) || isNaN(h2)) return '—';
-    let diff = (h2 * 60 + m2) - (h1 * 60 + m1);
-    if (diff < 0) diff += 24 * 60;
-    const hours = Math.floor(diff / 60);
-    const mins = diff % 60;
-    return `${hours}h ${mins > 0 ? mins + 'm' : '00m'}`;
-  }
-  function renderAdminView() {
-    document.getElementById('izostanakHeaderTitle').innerText = `Dodaj izostanak za ${selectedAdminDate}`;
-
-    const records = getRecords();
-    const dayData = records[selectedAdminDate] || {};
-    const isAdmin = (currentUserRole === "ADMIN");
-    let dosloCount = 0;
-    let zavrsiloCount = 0;
-    let nijeCount = 0;
-    const tbody = document.getElementById('adminTableBody');
-    const izostanciDiv = document.getElementById('izostanciList');
-
-    tbody.innerHTML = '';
-    izostanciDiv.innerHTML = '';
-    WORKERS.forEach(worker => {
-      const rec = dayData[worker] || {};
-      const dolazak = rec.dolazak || '—';
-      const odlazak = rec.odlazak || '—';
-      const ukupno = calcDuration(rec.dolazak, rec.odlazak);
-
-      let status = 'Nije evidentirano';
-      let badgeStyle = 'background:#f1f5f9; color:#475569;';
-      if (rec.izostanak) {
-        status = rec.izostanak;
-        badgeStyle = 'background:#fef3c7; color:#92400e;';
-      } else if (rec.dolazak && !rec.odlazak) {
-        status = 'Na poslu';
-        badgeStyle = 'background:#e8f5e9; color:#2e7d32;';
-        dosloCount++;
-      } else if (rec.dolazak && rec.odlazak) {
-        status = 'Završio';
-        badgeStyle = 'background:#e0f2fe; color:#0369a1;';
-        dosloCount++;
-        zavrsiloCount++;
-      } else {
-        nijeCount++;
-      }
-      let actionsCell = '';
-      if (isAdmin) {
-        actionsCell = `
-          <td style="text-align: right; white-space: nowrap;">
-            <button class="btn-table-edit" onclick="adminEditRecord('${worker}')">✏️ Uredi sate</button>
-            <button class="btn-table-del" onclick="adminDeleteRecord('${worker}')" style="padding:4px 8px;">🗑️ Obriši</button>
-          </td>
-        `;
-      }
-      tbody.innerHTML += `
-        <tr>
-          <td><strong>${worker}</strong></td>
-          <td>${dolazak}</td>
-          <td>${odlazak}</td>
-          <td>${ukupno}</td>
-          <td><span class="badge-status" style="${badgeStyle}">${status}</span></td>
-          ${actionsCell}
-        </tr>
-      `;
-      if (isAdmin) {
-        const currentIzostanak = rec.izostanak || '';
-        izostanciDiv.innerHTML += `
-          <div class="izostanak-row">
-            <span style="font-weight:600; font-size:14px;">${worker}</span>
-            <select onchange="setIzostanak('${worker}', this.value)">
-              <option value="" ${currentIzostanak === '' ? 'selected' : ''}>— Odaberi izostanak —</option>
-              <option value="Godišnji odmor" ${currentIzostanak === 'Godišnji odmor' ? 'selected' : ''}>Godišnji odmor</option>
-              <option value="Bolovanje" ${currentIzostanak === 'Bolovanje' ? 'selected' : ''}>Bolovanje</option>
-              <option value="Plaćeni dopust" ${currentIzostanak === 'Plaćeni dopust' ? 'selected' : ''}>Plaćeni dopust</option>
-              <option value="Neopravdano" ${currentIzostanak === 'Neopravdano' ? 'selected' : ''}>Neopravdano</option>
-            </select>
-          </div>
-        `;
-      }
-    });
-    document.getElementById('kpiAktivni').innerText = WORKERS.length;
-    document.getElementById('kpiDoslo').innerText = dosloCount;
-    document.getElementById('kpiZavrsilo').innerText = zavrsiloCount;
-    document.getElementById('kpiNije').innerText = nijeCount;
-  }
-  function exportCSV() {
-    const records = getRecords();
-    const dayData = records[selectedAdminDate] || {};
-    let csv = "﻿";
-    csv += "Datum;Zaposlenik;Dolazak;Odlazak;Ukupno sati;Status\n";
-    WORKERS.forEach(w => {
-      const rec = dayData[w] || {};
-      const dol = rec.dolazak || '';
-      const odl = rec.odlazak || '';
-      const ukupno = calcDuration(rec.dolazak, rec.odlazak);
-      let status = 'Nije evidentirano';
-      if (rec.izostanak) {
-        status = rec.izostanak;
-      } else if (dol && !odl) {
-        status = 'Na poslu';
-      } else if (dol && odl) {
-        status = 'Završio smjenu';
-      }
-      csv += `"${selectedAdminDate}";"${w}";"${dol}";"${odl}";"${ukupno === '—' ? '' : ukupno}";"${status}"\n`;
-    });
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", `Evidencija_${selectedAdminDate}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }
-  init();
-</script>
-</body>
-</html>
+function deleteRow_(sheet, date, worker) {
+  const rowIndex = findRow_(sheet, date, worker);
+  if (rowIndex !== -1) sheet.deleteRow(rowIndex);
+}
