@@ -384,7 +384,7 @@ cursor: pointer;
 </div>
 <div class="header-right">
 <span id="syncStatus">⏳ Sinkronizacija...</span>
-<button class="btn-admin-nav" onclick="openAdminPinModal()">Administracija</button>
+<button class="btn-admin-nav" id="btnAdminNav" onclick="openAdminPinModal()">Administracija</button>
 </div>
 </header>
 <!-- POGLED ZA RADNIKA -->
@@ -414,8 +414,8 @@ cursor: pointer;
 <span>&larr;</span> ODLAZAK (16:00)
 </button>
 </div>
-<div class="admin-fast-pin">
-<span style="font-size: 11px; color: var(--muted);">Pristup (Vedran PIN: 2468 / Knjigovođa PIN: 1357)</span>
+<div class="admin-fast-pin" id="adminFastPinBox">
+<span style="font-size: 11px; color: var(--muted);">Pristup za administraciju/knjigovodstvo</span>
 <input type="password" id="fastPinInput" placeholder="PIN">
 <button class="btn-fast-admin" onclick="checkFastPin()">Otvori izvještaje</button>
 </div>
@@ -488,7 +488,7 @@ cursor: pointer;
 <div class="modal-card">
 <div style="font-size: 11px; font-weight: 700; color: var(--brand-green); letter-spacing: 1px; margin-bottom: 6px;">PRIJAVA U SUSTAV</div>
 <h3>Unesite PIN</h3>
-<p>Unesite PIN za Administratora (2468) ili Knjigovodstvo (1357).</p>
+<p>Unesite PIN za pristup administraciji.</p>
 <input type="password" id="modalPinInput" class="modal-input" placeholder="PIN" autofocus>
 <button class="btn-modal-submit" onclick="submitPinModal()">Otvori sustav</button>
 <button style="margin-top: 10px; background: none; border: none; color: var(--muted); cursor: pointer;" onclick="closePinModal()">Odustani</button>
@@ -694,11 +694,16 @@ if (currentUserRole !== "NONE") renderAdminView();
 async function init() {
 document.getElementById('adminDatePicker').value = selectedAdminDate;
 
-// Osobni link: sakrij gumb "Promijeni" da nitko drugi ne može odabrati
-// ime ovog radnika na ovom linku.
+// Osobni link: sakrij gumb "Promijeni" (izbor imena) I cijeli admin/PIN
+// pristup (gumb "Administracija" te brzi PIN unos) - obični radnik na
+// svom osobnom linku nema nikakav razlog niti mogućnost ući u administraciju.
 if (lockedWorker) {
 const btn = document.getElementById('btnPromijeni');
 if (btn) btn.classList.add('hidden');
+const adminNav = document.getElementById('btnAdminNav');
+if (adminNav) adminNav.classList.add('hidden');
+const fastPin = document.getElementById('adminFastPinBox');
+if (fastPin) fastPin.classList.add('hidden');
 }
 // Link s nepoznatim ?w= parametrom: onemogući evidentiranje dok se ne
 // javi ispravan link, umjesto da nagađamo tko je radnik.
@@ -816,6 +821,7 @@ alert(`✅ Zabilježeno: ${currentWorker} [${action === 'Prijava' ? 'DOLAZAK (' 
 }
 }
 function openAdminPinModal() {
+if (lockedWorker) return; // osobni link radnika - admin pristup je onemogućen
 document.getElementById('pinModal').classList.remove('hidden');
 document.getElementById('modalPinInput').value = '';
 document.getElementById('modalPinInput').focus();
@@ -828,10 +834,12 @@ const pin = document.getElementById('modalPinInput').value.trim();
 handlePinAuth(pin);
 }
 function checkFastPin() {
+if (lockedWorker) return; // osobni link radnika - admin pristup je onemogućen
 const pin = document.getElementById('fastPinInput').value.trim();
 handlePinAuth(pin);
 }
 function handlePinAuth(pin) {
+if (lockedWorker) return; // osobni link radnika - admin pristup je onemogućen
 if (pin === PIN_ADMIN) {
 currentUserRole = "ADMIN";
 closePinModal();
