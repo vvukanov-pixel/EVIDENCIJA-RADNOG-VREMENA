@@ -444,6 +444,13 @@ cursor: pointer;
 <button class="btn-export" onclick="exportCSV()">Preuzmi Excel/CSV</button>
 </div>
 </div>
+<div id="knjigovodstvoBar" class="admin-actions" style="margin-top: 10px;">
+<div class="date-picker-container">
+<input type="month" id="exportMonthPicker" class="date-picker-input">
+</div>
+<button class="btn-pill-action" id="btnExportKnjigovodstvo" onclick="exportZaKnjigovodstvo()">📑 Izvoz za knjigovodstvo</button>
+<span id="exportKnjigovodstvoStatus" style="font-size: 12px; color: var(--muted);"></span>
+</div>
 <div id="izostanakCardWrapper" class="card-box">
 <h3 id="izostanakHeaderTitle">Dodaj izostanak</h3>
 <p>Odaberite razlog uz zaposlenika koji nije bio na poslu za odabrani datum.</p>
@@ -693,6 +700,7 @@ if (currentUserRole !== "NONE") renderAdminView();
 
 async function init() {
 document.getElementById('adminDatePicker').value = selectedAdminDate;
+document.getElementById('exportMonthPicker').value = selectedAdminDate.slice(0, 7);
 
 // Osobni link: sakrij gumb "Promijeni" (izbor imena) I cijeli admin/PIN
 // pristup (gumb "Administracija" te brzi PIN unos) - obični radnik na
@@ -977,7 +985,8 @@ izostanciDiv.innerHTML += `
 <select onchange="setIzostanak('${worker}', this.value)">
 <option value="" ${currentIzostanak === '' ? 'selected' : ''}>— Odaberi izostanak —</option>
 <option value="Godišnji odmor" ${currentIzostanak === 'Godišnji odmor' ? 'selected' : ''}>Godišnji odmor</option>
-<option value="Bolovanje" ${currentIzostanak === 'Bolovanje' ? 'selected' : ''}>Bolovanje</option>
+<option value="Bolovanje (do 42 dana)" ${currentIzostanak === 'Bolovanje (do 42 dana)' ? 'selected' : ''}>Bolovanje (do 42 dana)</option>
+<option value="Bolovanje (HZZO)" ${currentIzostanak === 'Bolovanje (HZZO)' ? 'selected' : ''}>Bolovanje (HZZO)</option>
 <option value="Plaćeni dopust" ${currentIzostanak === 'Plaćeni dopust' ? 'selected' : ''}>Plaćeni dopust</option>
 <option value="Neopravdano" ${currentIzostanak === 'Neopravdano' ? 'selected' : ''}>Neopravdano</option>
 </select>
@@ -989,6 +998,26 @@ document.getElementById('kpiAktivni').innerText = WORKERS.length;
 document.getElementById('kpiDoslo').innerText = dosloCount;
 document.getElementById('kpiZavrsilo').innerText = zavrsiloCount;
 document.getElementById('kpiNije').innerText = nijeCount;
+}
+async function exportZaKnjigovodstvo() {
+const month = document.getElementById('exportMonthPicker').value; // "YYYY-MM"
+const statusEl = document.getElementById('exportKnjigovodstvoStatus');
+const btn = document.getElementById('btnExportKnjigovodstvo');
+if (!month) { alert('Odaberite mjesec za izvoz.'); return; }
+btn.disabled = true;
+statusEl.innerText = '⏳ Generiram izvještaj...';
+try {
+const data = await fetchViaJsonp_(GOOGLE_SHEET_URL + '?action=export&month=' + encodeURIComponent(month));
+if (!data.ok) throw new Error(data.error || 'Nepoznata greška servera');
+statusEl.innerText = '✓ Gotovo — preuzimanje započinje';
+window.open(data.url, '_blank');
+} catch (err) {
+console.error('Greška pri izvozu za knjigovodstvo:', err);
+statusEl.innerText = '⚠️ Izvoz nije uspio';
+alert('⚠️ Izvoz nije uspio: ' + err.message);
+} finally {
+btn.disabled = false;
+}
 }
 function exportCSV() {
 const records = getRecords();
