@@ -1,1054 +1,237 @@
-<!DOCTYPE html>
-<html lang="hr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Evidencija radnog vremena - PORTAL MONTAŽA&SERVIS</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-:root {
---bg-warm: #f6f4ee;
---card-bg: #ffffff;
---text-dark: #1b241e;
---brand-green: #1b4332;
---btn-dolazak: #a3c2b1;
---btn-dolazak-hover: #8eaf9d;
---btn-odlazak: #a84b42;
---btn-odlazak-hover: #8f3e36;
---border-color: #e5e3dc;
---muted: #6c7570;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-font-family: 'Plus Jakarta Sans', sans-serif;
-background-color: var(--bg-warm);
-color: var(--text-dark);
-min-height: 100vh;
-padding: 16px;
-}
-.container { max-width: 950px; margin: 0 auto; }
-.app-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-padding: 12px 0;
-margin-bottom: 24px;
-gap: 12px;
-flex-wrap: wrap;
-}
-.brand-group { display: flex; align-items: center; gap: 12px; }
-.brand-badge {
-background: var(--brand-green);
-color: #fff;
-font-family: 'Playfair Display', serif;
-font-weight: 700;
-font-size: 22px;
-width: 44px;
-height: 44px;
-border-radius: 8px;
-display: flex;
-align-items: center;
-justify-content: center;
-}
-.brand-titles h1 { font-size: 17px; font-weight: 700; color: var(--text-dark); }
-.brand-titles p { font-size: 13px; color: var(--muted); }
-.header-right { display: flex; align-items: center; gap: 12px; }
-#syncStatus {
-font-size: 12px;
-color: var(--muted);
-white-space: nowrap;
-}
-.btn-admin-nav {
-background: #fff;
-border: 1px solid var(--border-color);
-padding: 8px 18px;
-border-radius: 8px;
-font-weight: 600;
-font-size: 13px;
-cursor: pointer;
-color: var(--text-dark);
-}
-.user-hero { text-align: center; margin: 30px 0 25px; }
-.today-pill {
-font-size: 12px;
-font-weight: 700;
-letter-spacing: 1.5px;
-color: var(--brand-green);
-text-transform: uppercase;
-margin-bottom: 8px;
-}
-.user-greeting {
-font-family: 'Playfair Display', serif;
-font-size: 38px;
-font-weight: 700;
-line-height: 1.15;
-color: var(--text-dark);
-margin-bottom: 10px;
-}
-.user-subtext { font-size: 14px; color: var(--muted); }
-.main-action-card {
-background: var(--card-bg);
-border-radius: 16px;
-padding: 24px;
-box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-border: 1px solid var(--border-color);
-max-width: 540px;
-margin: 0 auto 30px;
-}
-.user-switch-bar {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 16px;
-}
-.switch-label { font-size: 12px; color: var(--muted); }
-.current-user-name { font-size: 16px; font-weight: 700; color: var(--text-dark); }
-.btn-promijeni {
-background: #f1f0ea;
-border: 1px solid var(--border-color);
-padding: 6px 14px;
-border-radius: 6px;
-font-size: 13px;
-font-weight: 600;
-cursor: pointer;
-}
-.status-box {
-background: #f2f7f4;
-border-left: 3px solid var(--brand-green);
-padding: 14px 16px;
-border-radius: 6px;
-margin-bottom: 20px;
-}
-.status-title { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
-.status-desc { font-size: 15px; font-weight: 700; color: var(--text-dark); }
-.action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.btn-action {
-border: none;
-padding: 16px 12px;
-border-radius: 10px;
-font-size: 14px;
-font-weight: 700;
-letter-spacing: 0.5px;
-color: #ffffff;
-cursor: pointer;
-display: flex;
-align-items: center;
-justify-content: center;
-gap: 6px;
-transition: all 0.15s ease;
-}
-.btn-action:disabled { opacity: 0.6; cursor: not-allowed; }
-.btn-dolazak { background-color: var(--btn-dolazak); }
-.btn-dolazak:hover { background-color: var(--btn-dolazak-hover); }
-.btn-odlazak { background-color: var(--btn-odlazak); }
-.btn-odlazak:hover { background-color: var(--btn-odlazak-hover); }
-.admin-fast-pin {
-display: flex;
-align-items: center;
-justify-content: center;
-gap: 8px;
-margin-top: 20px;
-}
-.admin-fast-pin input {
-padding: 8px 12px;
-border: 1px solid var(--border-color);
-border-radius: 6px;
-width: 90px;
-text-align: center;
-font-size: 14px;
-background: #fff;
-}
-.btn-fast-admin {
-background: var(--text-dark);
-color: #fff;
-border: none;
-padding: 8px 14px;
-border-radius: 6px;
-font-weight: 600;
-font-size: 13px;
-cursor: pointer;
-}
-.footer-logo-box {
-text-align: center;
-margin-top: 40px;
-opacity: 0.28;
-font-family: Arial, Helvetica, sans-serif;
-font-weight: 900;
-letter-spacing: 2px;
-}
-.footer-logo-main { font-size: 38px; line-height: 1; }
-.footer-logo-sub { font-size: 12px; letter-spacing: 3px; margin-top: 4px; }
-/* ADMIN */
-.admin-top-bar {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 24px;
-flex-wrap: wrap;
-gap: 16px;
-}
-.admin-title-group h2 {
-font-family: 'Playfair Display', serif;
-font-size: 34px;
-font-weight: 700;
-line-height: 1.1;
-}
-.admin-title-group p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+/**
+ * ISPRAVLJENA VERZIJA:
+ * 1. Svaki stupac za svaki dan spaja točno svoja 2 retka (ne spaja stupce međusobno).
+ * 2. batchUpdate šalje sve u jednom ili dva velika bloka (nema timeouta).
+ * 3. Format u redu zbroja odgovara točno originalnom obrascu knjigovodstva.
+ */
+function generirajIzvjestajZaKnjigovodstvo_(month) {
+  const parts = month.split("-");
+  const year = parseInt(parts[0], 10);
+  const monthIndex = parseInt(parts[1], 10) - 1;
+  const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+  const tz = SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone();
 
-.admin-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.date-picker-container {
-display: flex;
-align-items: center;
-gap: 6px;
-background: #fff;
-border: 1px solid var(--border-color);
-padding: 4px 8px;
-border-radius: 8px;
-}
-.date-picker-input {
-border: none;
-font-family: inherit;
-font-weight: 700;
-font-size: 14px;
-color: var(--brand-green);
-outline: none;
-background: transparent;
-cursor: pointer;
-padding: 4px;
-}
-.btn-date-arrow {
-background: #f1f0eb;
-border: none;
-border-radius: 4px;
-padding: 4px 8px;
-font-weight: bold;
-cursor: pointer;
-color: var(--text-dark);
-}
-.btn-date-arrow:hover { background: #e2e0d8; }
-.btn-pill-action {
-background: #fff;
-border: 1px solid var(--border-color);
-padding: 9px 16px;
-border-radius: 8px;
-font-weight: 600;
-font-size: 13px;
-cursor: pointer;
-color: var(--text-dark);
-}
-.btn-export {
-background: var(--brand-green);
-color: #fff;
-border: none;
-padding: 9px 20px;
-border-radius: 8px;
-font-weight: 700;
-font-size: 13px;
-cursor: pointer;
-}
-.card-box {
-background: #fff;
-border-radius: 12px;
-padding: 20px;
-border: 1px solid var(--border-color);
-margin-bottom: 24px;
-}
-.card-box h3 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-.card-box p { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+  const sourceSheet = getSheet_();
+  const raw = sourceSheet.getDataRange().getValues();
+  const headers = raw.shift();
+  const byDateWorker = {};
+  raw.forEach(function (row) {
+    const obj = {};
+    headers.forEach(function (h, i) { obj[h] = normalizeCell_(h, row[i], tz); });
+    if (!obj["Datum"] || !obj["Zaposlenik"]) return;
+    byDateWorker[obj["Datum"] + "|" + obj["Zaposlenik"]] = obj;
+  });
 
-.izostanak-row {
-display: flex;
-justify-content: space-between;
-align-items: center;
-padding: 10px 0;
-border-bottom: 1px solid #f1f0eb;
-}
-.izostanak-row:last-child { border-bottom: none; }
-.izostanak-row select {
-padding: 8px 12px;
-border: 1px solid var(--border-color);
-border-radius: 6px;
-font-size: 13px;
-background: #fff;
-}
-.kpi-row {
-display: grid;
-grid-template-columns: repeat(4, 1fr);
-gap: 12px;
-margin-bottom: 24px;
-}
-.kpi-card {
-background: #fff;
-border: 1px solid var(--border-color);
-border-radius: 12px;
-padding: 16px;
-}
-.kpi-label { font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
-.kpi-value { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; }
-.table-container {
-background: #fff;
-border-radius: 12px;
-border: 1px solid var(--border-color);
-overflow-x: auto;
-padding: 12px 16px;
-}
-table { width: 100%; border-collapse: collapse; text-align: left; }
-th {
-font-size: 11px;
-letter-spacing: 1px;
-text-transform: uppercase;
-color: var(--muted);
-padding: 12px 8px;
-border-bottom: 1px solid var(--border-color);
-}
-td { padding: 14px 8px; font-size: 14px; border-bottom: 1px solid #f4f3ef; vertical-align: middle; }
-tr:last-child td { border-bottom: none; }
-.badge-status {
-display: inline-block;
-padding: 4px 10px;
-border-radius: 20px;
-font-size: 12px;
-font-weight: 600;
-}
-.btn-table-edit {
-background: #f1f5f9;
-border: 1px solid #cbd5e1;
-padding: 4px 8px;
-border-radius: 6px;
-font-size: 12px;
-font-weight: 600;
-cursor: pointer;
-color: #334155;
-margin-right: 4px;
-}
-.btn-table-del {
-background: #fee2e2;
-border: 1px solid #fca5a5;
-padding: 6px 12px;
-border-radius: 6px;
-font-size: 12px;
-font-weight: 700;
-cursor: pointer;
-color: #991b1b;
-}
-.modal-overlay {
-position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-display: flex; align-items: center; justify-content: center;
-z-index: 100; padding: 16px;
-}
-.modal-card {
-background: #fff;
-border-radius: 16px;
-padding: 24px;
-width: 100%;
-max-width: 400px;
-text-align: center;
-box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-}
-.modal-card h3 { font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 8px; }
-.modal-card p { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
-.modal-input {
-width: 100%;
-padding: 14px;
-border: 2px solid var(--border-color);
-border-radius: 8px;
-font-size: 20px;
-text-align: center;
-letter-spacing: 6px;
-margin-bottom: 16px;
-}
-.btn-modal-submit {
-width: 100%;
-background: var(--brand-green);
-color: #fff;
-border: none;
-padding: 14px;
-border-radius: 8px;
-font-weight: 700;
-cursor: pointer;
-}
-.hidden { display: none !important; }
-</style>
-</head>
-<body>
-<div class="container">
-<header class="app-header">
-<div class="brand-group">
-<div class="brand-badge">V</div>
-<div class="brand-titles">
-<h1>Evidencija radnog vremena</h1>
-<p>Jednostavno. Točno. Pregledno.</p>
-</div>
-</div>
-<div class="header-right">
-<span id="syncStatus">⏳ Sinkronizacija...</span>
-<button class="btn-admin-nav" id="btnAdminNav" onclick="openAdminPinModal()">Administracija</button>
-</div>
-</header>
-<!-- POGLED ZA RADNIKA -->
-<div id="viewEmployee">
-<div class="user-hero">
-<div class="today-pill" id="todayPillText">EVIDENCIJA SMJENE</div>
-<h2 class="user-greeting">Pozdrav, <span id="currentEmployeeDisplay">...</span></h2>
-<p class="user-subtext">Evidentirajte početak ili završetak radnog dana.</p>
-</div>
-<div class="main-action-card">
-<div class="user-switch-bar">
-<div>
-<div class="switch-label">Ovaj mobitel koristi</div>
-<div class="current-user-name" id="currentEmployeeCardName">...</div>
-</div>
-<button class="btn-promijeni" id="btnPromijeni" onclick="openWorkerSelector()">Promijeni</button>
-</div>
-<div class="status-box">
-<div class="status-title">Današnji status</div>
-<div class="status-desc" id="userStatusDesc">Nije evidentirano</div>
-</div>
-<div class="action-grid">
-<button class="btn-action btn-dolazak" id="btnActionDolazak" onclick="recordAction('Prijava')">
-<span>&rarr;</span> DOLAZAK (08:00)
-</button>
-<button class="btn-action btn-odlazak" id="btnActionOdlazak" onclick="recordAction('Odjava')">
-<span>&larr;</span> ODLAZAK (16:00)
-</button>
-</div>
-<div class="admin-fast-pin" id="adminFastPinBox">
-<span style="font-size: 11px; color: var(--muted);">Pristup za administraciju/knjigovodstvo</span>
-<input type="password" id="fastPinInput" placeholder="PIN">
-<button class="btn-fast-admin" onclick="checkFastPin()">Otvori izvještaje</button>
-</div>
-</div>
-<div class="footer-logo-box">
-<div class="footer-logo-main">PORTAL</div>
-<div class="footer-logo-sub">MONTAŽA&SERVIS d.o.o. DUBROVNIK</div>
-</div>
-</div>
-<!-- ADMINISTRACIJA -->
-<div id="viewAdmin" class="hidden">
-<div class="admin-top-bar">
-<div class="admin-title-group">
-<div id="userRoleBadge" style="font-size: 11px; font-weight: 700; color: var(--brand-green); letter-spacing: 1px; margin-bottom: 4px;">ADMINISTRATOR VEDRAN</div>
-<h2>Dnevni izvještaj</h2>
-<p id="userRoleDesc">Pregled evidencije po datumima s opcijama izmjene i brisanja.</p>
-</div>
-<div class="admin-actions">
-<div class="date-picker-container">
-<button class="btn-date-arrow" onclick="changeDateByDays(-1)">◀</button>
-<input type="date" id="adminDatePicker" class="date-picker-input" onchange="onAdminDateChange(this.value)">
-<button class="btn-date-arrow" onclick="changeDateByDays(1)">▶</button>
-</div>
-<button class="btn-pill-action" onclick="refreshAndRender()">🔄 Osvježi</button>
-<button class="btn-pill-action" onclick="closeAdmin()">Natrag na prijavu</button>
-<button class="btn-export" onclick="exportCSV()">Preuzmi Excel/CSV</button>
-</div>
-</div>
-<div id="knjigovodstvoBar" class="admin-actions" style="margin-top: 10px;">
-<div class="date-picker-container">
-<input type="month" id="exportMonthPicker" class="date-picker-input">
-</div>
-<button class="btn-pill-action" id="btnExportKnjigovodstvo" onclick="exportZaKnjigovodstvo()">📑 Izvoz za knjigovodstvo</button>
-<span id="exportKnjigovodstvoStatus" style="font-size: 12px; color: var(--muted);"></span>
-</div>
-<div id="izostanakCardWrapper" class="card-box">
-<h3 id="izostanakHeaderTitle">Dodaj izostanak</h3>
-<p>Odaberite razlog uz zaposlenika koji nije bio na poslu za odabrani datum.</p>
-<div id="izostanciList"></div>
-</div>
-<div class="kpi-row">
-<div class="kpi-card">
-<div class="kpi-label">Aktivnih zaposlenika</div>
-<div class="kpi-value" id="kpiAktivni">11</div>
-</div>
-<div class="kpi-card">
-<div class="kpi-label">Došlo na posao</div>
-<div class="kpi-value" id="kpiDoslo">0</div>
-</div>
-<div class="kpi-card">
-<div class="kpi-label">Završilo smjenu</div>
-<div class="kpi-value" id="kpiZavrsilo">0</div>
-</div>
-<div class="kpi-card">
-<div class="kpi-label">Nije evidentirano</div>
-<div class="kpi-value" id="kpiNije">11</div>
-</div>
-</div>
-<div class="table-container">
-<table>
-<thead>
-<tr>
-<th>Zaposlenik</th>
-<th>Dolazak</th>
-<th>Odlazak</th>
-<th>Ukupno</th>
-<th>Status</th>
-<th id="thAdminActions" style="text-align: right;">Admin Radnje</th>
-</tr>
-</thead>
-<tbody id="adminTableBody"></tbody>
-</table>
-</div>
-</div>
-</div>
-<div id="pinModal" class="modal-overlay hidden">
-<div class="modal-card">
-<div style="font-size: 11px; font-weight: 700; color: var(--brand-green); letter-spacing: 1px; margin-bottom: 6px;">PRIJAVA U SUSTAV</div>
-<h3>Unesite PIN</h3>
-<p>Unesite PIN za pristup administraciji.</p>
-<input type="password" id="modalPinInput" class="modal-input" placeholder="PIN" autofocus>
-<button class="btn-modal-submit" onclick="submitPinModal()">Otvori sustav</button>
-<button style="margin-top: 10px; background: none; border: none; color: var(--muted); cursor: pointer;" onclick="closePinModal()">Odustani</button>
-</div>
-</div>
-<div id="workerModal" class="modal-overlay hidden">
-<div class="modal-card">
-<h3>Odaberite svoj profil</h3>
-<p>Odaberite ime koje će ovaj uređaj pamtiti.</p>
-<select id="workerModalSelect" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 15px; margin-bottom: 20px;"></select>
-<button class="btn-modal-submit" onclick="saveSelectedWorker()">Potvrdi</button>
-</div>
-</div>
-<script>
-// === POVEŽI OVO NA TVOJ GOOGLE APPS SCRIPT (Deploy > Web app > .../exec) ===
-const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwCPwcGed4fxrOZ3K-c3zRBuNY0JWhGlRdNrKr9HOcOjZ7KyMdaVV5p2HKVpu79ArRk_A/exec";
+  const holidaySet = hrvatskiBlagdani_(year);
 
-const PIN_ADMIN = "2468";
-const PIN_KNJIGOVODJA = "1357";
-// FIKSNI POPIS OD TOČNO 11 RADNIKA
-const WORKERS = [
-"Vedran Vukanović",
-"Siniša Pravica",
-"Ljubiša Došlo",
-"Slaven Puhalo",
-"Ranko Janjić",
-"Ankica Prkačin Bačić",
-"Nikolina Burnać",
-"Branislav Begenišić",
-"Miodrag Ćeranić",
-"Nikola Mrdić",
-"Zlatko Radiš"
-];
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheetName = "Izvoz " + month;
+  let outSheet = ss.getSheetByName(sheetName);
+  if (outSheet) ss.deleteSheet(outSheet);
+  outSheet = ss.insertSheet(sheetName);
+  const gid = outSheet.getSheetId();
 
-// --- OSOBNI LINKOVI (svaki radnik ima svoj link s ?w=slug u adresi) ---
-// Ovo sprječava da netko na dijeljenom uređaju odabere ime drugog radnika,
-// bez potrebe za PIN-ovima po radniku (admin/knjigovođa PIN ostaje nepromijenjen).
-function slugify_(name) {
-return name
-.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-.toLowerCase()
-.replace(/[^a-z0-9]+/g, "-")
-.replace(/^-+|-+$/g, "");
-}
-const WORKER_SLUGS = {};
-WORKERS.forEach(w => { WORKER_SLUGS[slugify_(w)] = w; });
+  // Radni dani (pon-pet)
+  const weekdays = [];
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateObj = new Date(year, monthIndex, d);
+    const dow = dateObj.getDay();
+    if (dow === 0 || dow === 6) continue;
+    const dateStr = Utilities.formatDate(dateObj, tz, "yyyy-MM-dd");
+    const dateDisplay = Utilities.formatDate(dateObj, tz, "dd.MM.yyyy");
+    weekdays.push({ dateObj: dateObj, dateStr: dateStr, dateDisplay: dateDisplay, isHoliday: holidaySet.has(dateStr) });
+  }
 
-const urlParams_ = new URLSearchParams(location.search);
-const requestedSlug_ = (urlParams_.get("w") || "").trim().toLowerCase();
-const lockedWorker = requestedSlug_ ? (WORKER_SLUGS[requestedSlug_] || null) : null;
-const linkNotRecognized = !!requestedSlug_ && !lockedWorker;
+  const grid = [];
+  const merges = []; 
+  const reviewRows = [];
+  const employeeBlocks = [];
 
-let currentUserRole = "NONE";
-let currentWorker = lockedWorker || localStorage.getItem('active_worker_profile_v5') || WORKERS[0];
-let selectedAdminDate = new Date().toISOString().slice(0, 10);
+  // --- 1. Zaglavlje (2 retka) ---
+  const hdr1 = blankRow40_();
+  const hdr2 = blankRow40_();
+  hdr1[0] = "Datum";
+  hdr1[2] = "Radno mjesto";
+  hdr1[3] = "Od - do";
+  hdr2[3] = "Od - do";
+  FIELD_COLS_.forEach(function (f) { hdr1[f.col - 1] = f.header; });
+  grid.push(hdr1, hdr2);
 
-// Svi podaci o dolascima/odlascima žive na SERVERU (Google Sheet), ne u localStorage.
-// localStorage se koristi SAMO kao rezervna kopija za trenutke bez interneta.
-let serverRecords = {}; // { "2026-08-30": { "Ime Prezime": {dolazak, odlazak, izostanak} } }
-let isSyncing = false;
+  merges.push([0, 2, 0, 1]); // Datum (A1:A2)
+  merges.push([0, 2, 1, 2]); // Prazno/Datum kolona (B1:B2)
+  merges.push([0, 2, 2, 3]); // Radno mjesto (C1:C2)
+  FIELD_COLS_.forEach(function (f) { merges.push([0, 2, f.col - 1, f.col]); });
 
-function getTodayKey() {
-return new Date().toISOString().slice(0, 10);
+  let rowCursor = 2;
+
+  // --- 2. Radnici i dani ---
+  WORKERS_ORDER_.forEach(function (worker) {
+    const info = EMPLOYEE_CODES_[worker];
+    if (!info) return;
+    const codeStr = String(info.code);
+    const padded = codeStr.length >= 6 ? codeStr : (new Array(6 - codeStr.length + 1).join(" ") + codeStr);
+
+    const empHeaderRow = blankRow40_();
+    empHeaderRow[0] = "-";
+    empHeaderRow[1] = padded + " - " + info.display;
+    grid.push(empHeaderRow);
+
+    const empHeaderRow0 = rowCursor;
+    rowCursor++;
+    merges.push([empHeaderRow0, empHeaderRow0 + 1, 1, 40]); // B:AN spajanje za ime radnika
+
+    const dataStart0 = rowCursor;
+    const sched = WORKER_SCHEDULE_[worker] || { dolazak: "08:00", odlazak: "16:00" };
+    const dnevnaNorma = satiIzmedju_(sched.dolazak, sched.odlazak);
+
+    const totals = {};
+    FIELD_COLS_.forEach(function (f) { totals[f.col] = 0; });
+
+    weekdays.forEach(function (wd) {
+      const rowA = blankRow40_();
+      const rowB = blankRow40_();
+
+      rowA[1] = wd.dateObj;
+      rowA[2] = RADNO_MJESTO_[worker] || "";
+      rowA[7] = dnevnaNorma / 24;      // Satnica
+      rowA[21] = 24 - dnevnaNorma;     // Dnevni odmor
+
+      const rec = byDateWorker[wd.dateStr + "|" + worker];
+      let needsReview = false;
+
+      if (rec && rec["Dolazak"] && rec["Odlazak"] && rec["Dolazak"] !== "" && rec["Odlazak"] !== "") {
+        rowA[3] = wd.dateDisplay + " " + rec["Dolazak"] + " - " + wd.dateDisplay + " " + rec["Odlazak"];
+        const sati = satiIzmedju_(rec["Dolazak"], rec["Odlazak"]);
+        rowA[4] = sati / 24; 
+        totals[5] += sati;
+      } else if (rec && rec["Izostanak"]) {
+        rowA[3] = wd.dateDisplay + " 00:00 - " + wd.dateDisplay + " 00:00";
+        const kolona = mapirajIzostanak_(rec["Izostanak"]);
+        if (kolona) {
+          const f = FIELD_COLS_.find(function (x) { return x.header === kolona; });
+          if (f) {
+            rowA[f.col - 1] = dnevnaNorma / 24;
+            totals[f.col] += dnevnaNorma;
+          }
+        }
+      } else if (wd.isHoliday) {
+        rowA[3] = wd.dateDisplay + " 00:00 - " + wd.dateDisplay + " 00:00";
+        rowA[15] = dnevnaNorma / 24; 
+        totals[16] += dnevnaNorma;
+      } else {
+        rowA[3] = "";
+        needsReview = true;
+      }
+      rowB[3] = " - ";
+
+      totals[8] += dnevnaNorma;
+      totals[22] += (24 - dnevnaNorma);
+
+      const r0 = rowCursor;
+      grid.push(rowA, rowB);
+      rowCursor += 2;
+
+      // ISPRAVAK MERGE-a: Spaja se točno 2 vertikalna retka ZA SVAKI STUPAC pojedinačno
+      // Stupci A (0), B (1), C (2)
+      merges.push([r0, r0 + 2, 0, 1]);
+      merges.push([r0, r0 + 2, 1, 2]);
+      merges.push([r0, r0 + 2, 2, 3]);
+      // Stupci E do AN (indeksi 4 do 39) - stupac D (indeks 3) ostaje odvojen za "Od - do" i " - "
+      for (let c = 4; c < 40; c++) {
+        merges.push([r0, r0 + 2, c, c + 1]);
+      }
+
+      if (needsReview) reviewRows.push(r0);
+    });
+
+    const dataEndExcl0 = rowCursor;
+
+    // Redak sa zbrojem (Totals)
+    const totalsRow = blankRow40_();
+    FIELD_COLS_.forEach(function (f) {
+      const val = totals[f.col] || 0;
+      // U originalu knjigovodstva zbrojevi su obični brojevi/stringovi bez dijeljenja s 24
+      totalsRow[f.col - 1] = val === 0 ? "0" : String(Math.round(val * 100) / 100);
+    });
+    grid.push(totalsRow);
+    const totalsRow0 = rowCursor;
+    rowCursor++;
+
+    employeeBlocks.push({ empHeaderRow0: empHeaderRow0, dataStart0: dataStart0, dataEndExcl0: dataEndExcl0, totalsRow0: totalsRow0 });
+  });
+
+  // --- 3. Upis podataka u Sheet ---
+  outSheet.getRange(1, 1, grid.length, 40).setValues(grid);
+
+  // --- 4. Formatiranje ---
+  const fullRange = outSheet.getRange(1, 1, grid.length, 40);
+  fullRange.setFontFamily("Tahoma").setFontSize(8).setVerticalAlignment("top");
+  fullRange.setBorder(true, true, true, true, true, true, "#a0a0a0", SpreadsheetApp.BorderStyle.SOLID);
+  fullRange.setBackground("#ffffff");
+
+  outSheet.getRange(1, 1, grid.length, 1).setHorizontalAlignment("left");
+  outSheet.getRange(1, 2, grid.length, 1).setNumberFormat("yyyy-mm-dd").setHorizontalAlignment("center");
+  outSheet.getRange(1, 3, grid.length, 1).setHorizontalAlignment("left");
+  outSheet.getRange(1, 4, grid.length, 1).setHorizontalAlignment("center");
+  
+  FIELD_COLS_.forEach(function (f) {
+    const rng = outSheet.getRange(1, f.col, grid.length, 1);
+    rng.setHorizontalAlignment("center");
+    if (f.type === "hours") rng.setNumberFormat("h:mm");
+  });
+
+  outSheet.getRange(1, 1, 2, 40).setBackground("#b0cbf0");
+
+  employeeBlocks.forEach(function (b) {
+    outSheet.getRange(b.empHeaderRow0 + 1, 1, 1, 40).setBackground("#fffdca");
+    outSheet.getRange(b.empHeaderRow0 + 1, 1, 1, 1).setBackground("#f0f0f0");
+    outSheet.getRange(b.dataStart0 + 1, 1, b.dataEndExcl0 - b.dataStart0, 1).setBackground("#fffdca");
+    
+    // Zbrojevi
+    const totRange = outSheet.getRange(b.totalsRow0 + 1, 1, 1, 40);
+    totRange.setBackground("#ffd895");
+    totRange.setNumberFormat("@").setHorizontalAlignment("right");
+  });
+
+  reviewRows.forEach(function (r0) {
+    outSheet.getRange(r0 + 1, 1, 2, 40).setBackground("#fff3cd");
+    outSheet.getRange(r0 + 1, 4).setNote("Nema zabilježenog klika u aplikaciji za ovaj dan.");
+  });
+
+  for (let c = 1; c <= 40; c++) {
+    const excelW = COL_WIDTHS_EXCEL_[c] || 8;
+    outSheet.setColumnWidth(c, Math.round(excelW * 7 + 5));
+  }
+  outSheet.setRowHeights(1, grid.length, 18);
+  outSheet.setFrozenRows(2);
+
+  // --- 5. Brzo grupno spajanje (Sheets API) ---
+  spojiCelijeOptimizirano_(ss.getId(), gid, merges);
+
+  return "https://docs.google.com/spreadsheets/d/" + ss.getId() + "/export?format=xlsx&gid=" + gid;
 }
 
-function getCachedRecords() {
-try {
-return JSON.parse(localStorage.getItem('attendance_records_cache') || '{}');
-} catch (e) { return {}; }
+/**
+ * Šalje do 5000 spajanja po pozivu čime se izbjegava timeout (2 poziva umjesto 20).
+ */
+function spojiCelijeOptimizirano_(spreadsheetId, gid, merges) {
+  const CHUNK = 5000;
+  for (let i = 0; i < merges.length; i += CHUNK) {
+    const chunk = merges.slice(i, i + CHUNK);
+    const requests = chunk.map(function (m) {
+      return {
+        mergeCells: {
+          range: {
+            sheetId: gid,
+            startRowIndex: m[0],
+            endRowIndex: m[1],
+            startColumnIndex: m[2],
+            endColumnIndex: m[3]
+          },
+          mergeType: "MERGE_ALL"
+        }
+      };
+    });
+    Sheets.Spreadsheets.batchUpdate({ requests: requests }, spreadsheetId);
+  }
 }
-function setCachedRecords(data) {
-try { localStorage.setItem('attendance_records_cache', JSON.stringify(data)); } catch (e) {}
-}
-
-function getRecords() {
-return serverRecords;
-}
-
-function getShiftForWorker(name) {
-if (!name) return { dolazak: "08:00", odlazak: "16:00", label: "08:00 - 16:00" };
-const isAnkica = name.toLowerCase().includes("ankica");
-return {
-dolazak: isAnkica ? "09:00" : "08:00",
-odlazak: isAnkica ? "13:00" : "16:00",
-label: isAnkica ? "09:00 - 13:00" : "08:00 - 16:00"
-};
-}
-
-// --- KOMUNIKACIJA S GOOGLE SHEETOM ---
-
-// Google Apps Script ne šalje Access-Control-Allow-Origin zaglavlje, pa obični
-// fetch() GET zahtjev s druge domene (npr. GitHub Pages) blokira CORS politika
-// preglednika. Rješenje je JSONP: podaci se učitavaju preko <script> taga
-// (kao vanjska skripta), na što se CORS pravila ne primjenjuju.
-function fetchViaJsonp_(url) {
-return new Promise((resolve, reject) => {
-const callbackName = 'jsonpCb_' + Date.now() + '_' + Math.floor(Math.random() * 1e6);
-let settled = false;
-const script = document.createElement('script');
-
-const cleanup = () => {
-delete window[callbackName];
-if (script.parentNode) script.parentNode.removeChild(script);
-clearTimeout(timeoutId);
-};
-const timeoutId = setTimeout(() => {
-if (settled) return;
-settled = true;
-cleanup();
-reject(new Error('Vrijeme isteklo pri dohvatu podataka.'));
-}, 15000);
-
-window[callbackName] = (data) => {
-if (settled) return;
-settled = true;
-cleanup();
-resolve(data);
-};
-script.onerror = () => {
-if (settled) return;
-settled = true;
-cleanup();
-reject(new Error('Greška pri učitavanju podataka sa servera.'));
-};
-const sep = url.indexOf('?') === -1 ? '?' : '&';
-script.src = url + sep + 'callback=' + callbackName + '&_=' + Date.now();
-document.body.appendChild(script);
-});
-}
-
-async function fetchServerRecords() {
-isSyncing = true;
-updateSyncIndicator();
-try {
-const data = await fetchViaJsonp_(GOOGLE_SHEET_URL);
-if (!data.ok) throw new Error(data.error || "Nepoznata greška servera");
-const grouped = {};
-data.records.forEach(r => {
-const date = r["Datum"];
-const worker = r["Zaposlenik"];
-if (!date || !worker) return;
-if (!grouped[date]) grouped[date] = {};
-grouped[date][worker] = {
-dolazak: r["Dolazak"] || '',
-odlazak: r["Odlazak"] || '',
-izostanak: r["Izostanak"] || ''
-};
-});
-serverRecords = grouped;
-setCachedRecords(serverRecords);
-isSyncing = false;
-updateSyncIndicator(true, false);
-return true;
-} catch (err) {
-console.error("Greška pri dohvatu podataka sa servera:", err);
-serverRecords = getCachedRecords();
-isSyncing = false;
-updateSyncIndicator(false, true);
-return false;
-}
-}
-
-async function sendToServer(payload) {
-// Pisanje i dalje ide preko fetch(..., {mode:"no-cors"}) — zahtjev se pošalje i
-// Apps Script ga izvrši, samo se odgovor ne može pročitati (CORS), što je u redu
-// jer nakon slanja odmah ponovno dohvaćamo podatke (fetchServerRecords) preko JSONP-a.
-try {
-await fetch(GOOGLE_SHEET_URL, {
-method: "POST",
-mode: "no-cors",
-headers: { "Content-Type": "text/plain" },
-body: JSON.stringify(payload)
-});
-return true;
-} catch (err) {
-console.error("Greška pri slanju podataka na server:", err);
-alert("⚠️ Nije uspjelo spremanje na server. Provjeri internetsku vezu i pokušaj ponovno.");
-return false;
-}
-}
-
-function updateSyncIndicator(success, failed) {
-const el = document.getElementById('syncStatus');
-if (!el) return;
-const now = new Date().toLocaleTimeString('hr-HR', { hour: '2-digit', minute: '2-digit' });
-if (isSyncing) {
-el.innerText = '⏳ Sinkronizacija...';
-} else if (failed) {
-el.innerText = '⚠️ Nema veze — zadnji poznati podaci';
-} else {
-el.innerText = `✓ Ažurirano ${now}`;
-}
-}
-
-async function refreshAndRender() {
-await fetchServerRecords();
-updateWorkerDisplay();
-if (currentUserRole !== "NONE") renderAdminView();
-}
-
-// --- INICIJALIZACIJA ---
-
-async function init() {
-document.getElementById('adminDatePicker').value = selectedAdminDate;
-document.getElementById('exportMonthPicker').value = selectedAdminDate.slice(0, 7);
-
-// Osobni link: sakrij gumb "Promijeni" (izbor imena) I cijeli admin/PIN
-// pristup (gumb "Administracija" te brzi PIN unos) - obični radnik na
-// svom osobnom linku nema nikakav razlog niti mogućnost ući u administraciju.
-if (lockedWorker) {
-const btn = document.getElementById('btnPromijeni');
-if (btn) btn.classList.add('hidden');
-const adminNav = document.getElementById('btnAdminNav');
-if (adminNav) adminNav.classList.add('hidden');
-const fastPin = document.getElementById('adminFastPinBox');
-if (fastPin) fastPin.classList.add('hidden');
-}
-// Link s nepoznatim ?w= parametrom: onemogući evidentiranje dok se ne
-// javi ispravan link, umjesto da nagađamo tko je radnik.
-if (linkNotRecognized) {
-document.getElementById('btnActionDolazak').disabled = true;
-document.getElementById('btnActionOdlazak').disabled = true;
-document.getElementById('userStatusDesc').innerText = 'Link nije prepoznat — javite se Vedranu.';
-const btn = document.getElementById('btnPromijeni');
-if (btn) btn.classList.add('hidden');
-}
-
-serverRecords = getCachedRecords(); // odmah prikaži zadnje poznato, bez čekanja na mrežu
-updateWorkerDisplay();
-populateWorkerModalSelect();
-renderAdminView();
-
-await fetchServerRecords();
-updateWorkerDisplay();
-renderAdminView();
-
-// Automatsko osvježavanje svakih 20 sekundi da se promjene s drugih uređaja pojave i ovdje
-setInterval(refreshAndRender, 20000);
-}
-
-function onAdminDateChange(val) {
-if (!val) return;
-selectedAdminDate = val;
-renderAdminView();
-}
-function changeDateByDays(days) {
-const d = new Date(selectedAdminDate);
-d.setDate(d.getDate() + days);
-selectedAdminDate = d.toISOString().slice(0, 10);
-document.getElementById('adminDatePicker').value = selectedAdminDate;
-renderAdminView();
-}
-function updateWorkerDisplay() {
-if (linkNotRecognized) {
-document.getElementById('currentEmployeeDisplay').innerText = '?';
-document.getElementById('currentEmployeeCardName').innerText = 'Nepoznat link';
-return;
-}
-if (!WORKERS.includes(currentWorker)) {
-currentWorker = lockedWorker || WORKERS[0];
-if (!lockedWorker) localStorage.setItem('active_worker_profile_v5', currentWorker);
-}
-document.getElementById('currentEmployeeDisplay').innerText = currentWorker;
-document.getElementById('currentEmployeeCardName').innerText = currentWorker;
-
-const shift = getShiftForWorker(currentWorker);
-document.getElementById('todayPillText').innerText = `EVIDENCIJA SMJENE (${shift.label})`;
-document.getElementById('btnActionDolazak').innerHTML = `<span>&rarr;</span> DOLAZAK (${shift.dolazak})`;
-document.getElementById('btnActionOdlazak').innerHTML = `<span>&larr;</span> ODLAZAK (${shift.odlazak})`;
-const records = getRecords();
-const today = getTodayKey();
-const userToday = records[today] && records[today][currentWorker];
-if (userToday) {
-if (userToday.izostanak) {
-document.getElementById('userStatusDesc').innerText = userToday.izostanak;
-} else if (userToday.odlazak) {
-document.getElementById('userStatusDesc').innerText = `Završeno (${userToday.dolazak} - ${userToday.odlazak})`;
-} else if (userToday.dolazak) {
-document.getElementById('userStatusDesc').innerText = `Na poslu od ${userToday.dolazak}`;
-} else {
-document.getElementById('userStatusDesc').innerText = 'Nije evidentirano';
-}
-} else {
-document.getElementById('userStatusDesc').innerText = 'Nije evidentirano';
-}
-}
-function populateWorkerModalSelect() {
-const sel = document.getElementById('workerModalSelect');
-sel.innerHTML = '';
-WORKERS.forEach(w => {
-const opt = document.createElement('option');
-opt.value = w;
-opt.innerText = w;
-if (w === currentWorker) opt.selected = true;
-sel.appendChild(opt);
-});
-}
-function openWorkerSelector() {
-if (lockedWorker) return; // osobni link — izbor imena je onemogućen
-populateWorkerModalSelect();
-document.getElementById('workerModal').classList.remove('hidden');
-}
-function saveSelectedWorker() {
-if (lockedWorker) return; // osobni link — izbor imena je onemogućen
-currentWorker = document.getElementById('workerModalSelect').value;
-localStorage.setItem('active_worker_profile_v5', currentWorker);
-document.getElementById('workerModal').classList.add('hidden');
-updateWorkerDisplay();
-}
-async function recordAction(action) {
-if (linkNotRecognized) return;
-const today = getTodayKey();
-const shift = getShiftForWorker(currentWorker);
-const fixedTime = (action === "Prijava") ? shift.dolazak : shift.odlazak;
-
-const btnDolazak = document.getElementById('btnActionDolazak');
-const btnOdlazak = document.getElementById('btnActionOdlazak');
-btnDolazak.disabled = true;
-btnOdlazak.disabled = true;
-
-const ok = await sendToServer({ type: "ATTENDANCE", worker: currentWorker, action: action, time: fixedTime, date: today });
-await fetchServerRecords();
-
-btnDolazak.disabled = false;
-btnOdlazak.disabled = false;
-
-updateWorkerDisplay();
-renderAdminView();
-if (ok) {
-alert(`✅ Zabilježeno: ${currentWorker} [${action === 'Prijava' ? 'DOLAZAK (' + fixedTime + ')' : 'ODLAZAK (' + fixedTime + ')'}]`);
-}
-}
-function openAdminPinModal() {
-if (lockedWorker) return; // osobni link radnika - admin pristup je onemogućen
-document.getElementById('pinModal').classList.remove('hidden');
-document.getElementById('modalPinInput').value = '';
-document.getElementById('modalPinInput').focus();
-}
-function closePinModal() {
-document.getElementById('pinModal').classList.add('hidden');
-}
-function submitPinModal() {
-const pin = document.getElementById('modalPinInput').value.trim();
-handlePinAuth(pin);
-}
-function checkFastPin() {
-if (lockedWorker) return; // osobni link radnika - admin pristup je onemogućen
-const pin = document.getElementById('fastPinInput').value.trim();
-handlePinAuth(pin);
-}
-function handlePinAuth(pin) {
-if (lockedWorker) return; // osobni link radnika - admin pristup je onemogućen
-if (pin === PIN_ADMIN) {
-currentUserRole = "ADMIN";
-closePinModal();
-showAdminView();
-} else if (pin === PIN_KNJIGOVODJA) {
-currentUserRole = "KNJIGOVODJA";
-closePinModal();
-showAdminView();
-} else {
-alert("❌ Pogrešan PIN!");
-}
-}
-function showAdminView() {
-document.getElementById('viewEmployee').classList.add('hidden');
-document.getElementById('viewAdmin').classList.remove('hidden');
-const isAdmin = (currentUserRole === "ADMIN");
-
-document.getElementById('userRoleBadge').innerText = isAdmin ? "ADMINISTRATOR VEDRAN (PUNI PRISTUP)" : "KNJIGOVODSTVO (SAMO PREGLED & EXCEL)";
-document.getElementById('userRoleDesc').innerText = isAdmin ? "Pregled evidencije po datumima s opcijama izmjene i brisanja." : "Pregled i preuzimanje službenih Excel/CSV izvještaja.";
-
-document.getElementById('izostanakCardWrapper').classList.toggle('hidden', !isAdmin);
-document.getElementById('thAdminActions').classList.toggle('hidden', !isAdmin);
-refreshAndRender();
-}
-function closeAdmin() {
-currentUserRole = "NONE";
-document.getElementById('viewAdmin').classList.add('hidden');
-document.getElementById('viewEmployee').classList.remove('hidden');
-}
-async function adminEditRecord(worker) {
-if (currentUserRole !== "ADMIN") return;
-const dayData = serverRecords[selectedAdminDate] || {};
-const cur = dayData[worker] || {};
-const shift = getShiftForWorker(worker);
-const dol = prompt(`Unesite vrijeme DOLASKA za ${worker} (${selectedAdminDate}):`, cur.dolazak || shift.dolazak);
-if (dol === null) return;
-const odl = prompt(`Unesite vrijeme ODLASKA za ${worker} (${selectedAdminDate}):`, cur.odlazak || shift.odlazak);
-if (odl === null) return;
-
-const ok = await sendToServer({ type: "EDIT", worker: worker, date: selectedAdminDate, dolazak: dol.trim(), odlazak: odl.trim() });
-await fetchServerRecords();
-updateWorkerDisplay();
-renderAdminView();
-if (ok) alert(`✅ Ažurirano za ${worker}!`);
-}
-async function adminDeleteRecord(worker) {
-if (currentUserRole !== "ADMIN") return;
-if (!confirm(`Obrisati dnevni unos za ${worker} (${selectedAdminDate})?`)) return;
-
-const ok = await sendToServer({ type: "DELETE", worker: worker, date: selectedAdminDate });
-await fetchServerRecords();
-updateWorkerDisplay();
-renderAdminView();
-if (ok) alert(`🗑️ Obrisana evidencija.`);
-}
-async function setIzostanak(worker, razlog) {
-if (currentUserRole !== "ADMIN") return;
-await sendToServer({ type: "IZOSTANAK", worker: worker, date: selectedAdminDate, razlog: razlog });
-await fetchServerRecords();
-updateWorkerDisplay();
-renderAdminView();
-}
-function calcDuration(start, end) {
-if (!start || !end) return '—';
-const [h1, m1] = start.split(':').map(Number);
-const [h2, m2] = end.split(':').map(Number);
-if (isNaN(h1) || isNaN(h2)) return '—';
-let diff = (h2 * 60 + m2) - (h1 * 60 + m1);
-if (diff < 0) diff += 24 * 60;
-const hours = Math.floor(diff / 60);
-const mins = diff % 60;
-return `${hours}h ${mins > 0 ? mins + 'm' : '00m'}`;
-}
-function renderAdminView() {
-document.getElementById('izostanakHeaderTitle').innerText = `Dodaj izostanak za ${selectedAdminDate}`;
-
-const records = getRecords();
-const dayData = records[selectedAdminDate] || {};
-const isAdmin = (currentUserRole === "ADMIN");
-let dosloCount = 0;
-let zavrsiloCount = 0;
-let nijeCount = 0;
-const tbody = document.getElementById('adminTableBody');
-const izostanciDiv = document.getElementById('izostanciList');
-
-tbody.innerHTML = '';
-izostanciDiv.innerHTML = '';
-WORKERS.forEach(worker => {
-const rec = dayData[worker] || {};
-const dolazak = rec.dolazak || '—';
-const odlazak = rec.odlazak || '—';
-const ukupno = calcDuration(rec.dolazak, rec.odlazak);
-
-let status = 'Nije evidentirano';
-let badgeStyle = 'background:#f1f5f9; color:#475569;';
-if (rec.izostanak) {
-status = rec.izostanak;
-badgeStyle = 'background:#fef3c7; color:#92400e;';
-} else if (rec.dolazak && !rec.odlazak) {
-status = 'Na poslu';
-badgeStyle = 'background:#e8f5e9; color:#2e7d32;';
-dosloCount++;
-} else if (rec.dolazak && rec.odlazak) {
-status = 'Završio';
-badgeStyle = 'background:#e0f2fe; color:#0369a1;';
-dosloCount++;
-zavrsiloCount++;
-} else {
-nijeCount++;
-}
-let actionsCell = '';
-if (isAdmin) {
-actionsCell = `
-<td style="text-align: right; white-space: nowrap;">
-<button class="btn-table-edit" onclick="adminEditRecord('${worker}')">✏️ Uredi sate</button>
-<button class="btn-table-del" onclick="adminDeleteRecord('${worker}')" style="padding:4px 8px;">🗑️ Obriši</button>
-</td>
-`;
-}
-tbody.innerHTML += `
-<tr>
-<td><strong>${worker}</strong></td>
-<td>${dolazak}</td>
-<td>${odlazak}</td>
-<td>${ukupno}</td>
-<td><span class="badge-status" style="${badgeStyle}">${status}</span></td>
-${actionsCell}
-</tr>
-`;
-if (isAdmin) {
-const currentIzostanak = rec.izostanak || '';
-izostanciDiv.innerHTML += `
-<div class="izostanak-row">
-<span style="font-weight:600; font-size:14px;">${worker}</span>
-<select onchange="setIzostanak('${worker}', this.value)">
-<option value="" ${currentIzostanak === '' ? 'selected' : ''}>— Odaberi izostanak —</option>
-<option value="Godišnji odmor" ${currentIzostanak === 'Godišnji odmor' ? 'selected' : ''}>Godišnji odmor</option>
-<option value="Bolovanje (do 42 dana)" ${currentIzostanak === 'Bolovanje (do 42 dana)' ? 'selected' : ''}>Bolovanje (do 42 dana)</option>
-<option value="Bolovanje (HZZO)" ${currentIzostanak === 'Bolovanje (HZZO)' ? 'selected' : ''}>Bolovanje (HZZO)</option>
-<option value="Plaćeni dopust" ${currentIzostanak === 'Plaćeni dopust' ? 'selected' : ''}>Plaćeni dopust</option>
-<option value="Neopravdano" ${currentIzostanak === 'Neopravdano' ? 'selected' : ''}>Neopravdano</option>
-</select>
-</div>
-`;
-}
-});
-document.getElementById('kpiAktivni').innerText = WORKERS.length;
-document.getElementById('kpiDoslo').innerText = dosloCount;
-document.getElementById('kpiZavrsilo').innerText = zavrsiloCount;
-document.getElementById('kpiNije').innerText = nijeCount;
-}
-async function exportZaKnjigovodstvo() {
-const month = document.getElementById('exportMonthPicker').value; // "YYYY-MM"
-const statusEl = document.getElementById('exportKnjigovodstvoStatus');
-const btn = document.getElementById('btnExportKnjigovodstvo');
-if (!month) { alert('Odaberite mjesec za izvoz.'); return; }
-btn.disabled = true;
-statusEl.innerText = '⏳ Generiram izvještaj...';
-try {
-const data = await fetchViaJsonp_(GOOGLE_SHEET_URL + '?action=export&month=' + encodeURIComponent(month));
-if (!data.ok) throw new Error(data.error || 'Nepoznata greška servera');
-statusEl.innerText = '✓ Gotovo — preuzimanje započinje';
-window.open(data.url, '_blank');
-} catch (err) {
-console.error('Greška pri izvozu za knjigovodstvo:', err);
-statusEl.innerText = '⚠️ Izvoz nije uspio';
-alert('⚠️ Izvoz nije uspio: ' + err.message);
-} finally {
-btn.disabled = false;
-}
-}
-function exportCSV() {
-const records = getRecords();
-const dayData = records[selectedAdminDate] || {};
-let csv = " ";
-csv += "Datum;Zaposlenik;Dolazak;Odlazak;Ukupno sati;Status\n";
-WORKERS.forEach(w => {
-const rec = dayData[w] || {};
-const dol = rec.dolazak || '';
-const odl = rec.odlazak || '';
-const ukupno = calcDuration(rec.dolazak, rec.odlazak);
-let status = 'Nije evidentirano';
-if (rec.izostanak) {
-status = rec.izostanak;
-} else if (dol && !odl) {
-status = 'Na poslu';
-} else if (dol && odl) {
-status = 'Završio smjenu';
-}
-csv += `"${selectedAdminDate}";"${w}";"${dol}";"${odl}";"${ukupno === '—' ? '' : ukupno}";"${status}"\n`;
-});
-const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-const link = document.createElement("a");
-const url = URL.createObjectURL(blob);
-link.setAttribute("href", url);
-link.setAttribute("download", `Evidencija_${selectedAdminDate}.csv`);
-document.body.appendChild(link);
-link.click();
-document.body.removeChild(link);
-}
-init();
-</script>
-</body>
-</html>
